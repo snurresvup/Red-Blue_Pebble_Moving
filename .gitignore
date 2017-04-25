@@ -139,3 +139,6 @@ flycheck_*.el
 
 # directory configuration
 .dir-locals.el
+.idea/misc.xml
+.idea/modules.xml
+Red-Blue Pebble Moving.iml
