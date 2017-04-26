@@ -1,8 +1,10 @@
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import javafx.util.Pair;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
 
-public class Graph {
+import java.util.*;
+
+public class Graph{
   private Set<Vertex> vertices;
 
   public Graph(){
@@ -37,6 +39,24 @@ public class Graph {
     if(vertexB.hasEdgeTo(vertexA)) return false;
     vertexA.addEdge(vertexB);
     return true;
+  }
+
+  public void show(){
+    org.graphstream.graph.Graph vGraph = new SingleGraph("The graph");
+    vGraph.setStrict(false);
+    vGraph.setAutoCreate(true);
+
+    Set<Edge> addedEdges = new HashSet<>();
+    for(Vertex v : vertices){
+      v.getEdges().stream().forEach(vert -> {
+        Edge newEdge = new Edge(v, vert);
+        addedEdges.add(newEdge);
+      });
+    }
+
+    addedEdges.forEach(edge -> vGraph.addEdge(edge.toString(), edge.getA().toString(), edge.getB().toString()));
+
+    vGraph.display();
   }
 
 }
