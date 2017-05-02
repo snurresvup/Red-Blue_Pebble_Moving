@@ -1,30 +1,27 @@
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class Vertex {
   private String name;
-  private Set<Vertex> edges;
+  private Map<Vertex, Integer> edges;
   private Pebble[] pebbles;
 
   public Vertex(){
     name = UUID.randomUUID().toString();
-    edges = new HashSet<>();
+    edges = new HashMap<>();
     pebbles = new Pebble[Settings.COLORS];
   }
 
-  public void addEdge(Vertex connection) {
+  public void addEdge(Vertex connection, int weight) {
     if(this == connection) return;
-    edges.add(connection);
-    if(!connection.hasEdgeTo(this)) connection.addEdge(this);
+    edges.put(connection, weight);
+    if(!connection.hasEdgeTo(this)) connection.addEdge(this, weight);
   }
 
   public boolean hasEdgeTo(Vertex connection){
-    return edges.contains(connection);
+    return edges.containsKey(connection);
   }
 
-  public Set<Vertex> getEdges() {
+  public Map<Vertex, Integer> getEdges() {
     return edges;
   }
 
