@@ -17,18 +17,16 @@ public class PebbleSolver {
     Map<StartVertex, TargetVertex> res = new HashMap<>();
     Queue<Vertex> q = new LinkedList<>();
 
-    Vertex v = g.getFirstVertex();
-
     LinkedList<Vertex> graph = convertGraphToList(g);
 
     for(Vertex vert : graph){
       if(q.peek().getClass() == vert.getClass()){
         q.add(vert);
       } else {
-        if(v instanceof StartVertex){
-          res.put((StartVertex)v, (TargetVertex)vert);
+        if(vert instanceof StartVertex){
+          res.put((StartVertex)vert, (TargetVertex)q.remove());
         } else {
-          res.put((StartVertex)vert, (TargetVertex)vert);
+          res.put((StartVertex)q.remove(), (TargetVertex)vert);
         }
       }
     }
@@ -60,9 +58,9 @@ public class PebbleSolver {
         if (!vertex.equals(prev)) {
           prev = v;
           v = vertex;
+          res.add(v);
         }
       }
-      res.add(v);
     }
 
     return res;
