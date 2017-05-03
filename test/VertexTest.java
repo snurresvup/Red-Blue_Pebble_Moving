@@ -12,13 +12,13 @@ public class VertexTest {
 
   @BeforeEach
   public void setup(){
-    vertex1 = new Vertex();
-    vertex2 = new Vertex();
+    vertex1 = new StartVertex(new Pebble(PebbleColor.RED));
+    vertex2 = new TargetVertex();
 
     bluePebble = new Pebble(PebbleColor.BLUE);
 
     vertex1.addPebble(bluePebble);
-    vertex1.addEdge(vertex2);
+    vertex1.addEdge(vertex2, 1);
   }
 
   @Test
@@ -28,7 +28,7 @@ public class VertexTest {
 
   @Test
   public void shouldHaveTwoWayEdges(){
-    assertTrue(vertex1.getEdges().stream().findFirst().orElse(null).hasEdgeTo(vertex1));
+    assertTrue(vertex1.getEdges().keySet().stream().findFirst().orElse(null).hasEdgeTo(vertex1));
   }
 
   @Test
@@ -70,5 +70,33 @@ public class VertexTest {
     vertex1.addPebble(pebble);
     assertNotEquals(pebble, firstPebble);
     assertEquals(pebble, vertex1.getPebble(PebbleColor.BLUE));
+  }
+
+  @Test
+  public void shouldConnectProperly(){
+    Vertex a = new StartVertex(new Pebble(PebbleColor.RED));
+    Vertex b = new StartVertex(new Pebble(PebbleColor.RED));
+    Vertex c = new TargetVertex();
+    Vertex d = new TargetVertex();
+
+    a.addEdge(b,1);
+    b.addEdge(c,1);
+    c.addEdge(d,1);
+
+    assertTrue(a.getEdges().containsKey(b));
+    assertFalse(a.getEdges().containsKey(c));
+    assertFalse(a.getEdges().containsKey(d));
+
+    assertTrue(b.getEdges().containsKey(a));
+    assertTrue(b.getEdges().containsKey(c));
+    assertFalse(b.getEdges().containsKey(d));
+
+    assertTrue(c.getEdges().containsKey(b));
+    assertTrue(c.getEdges().containsKey(d));
+    assertFalse(c.getEdges().containsKey(a));
+
+    assertTrue(d.getEdges().containsKey(c));
+    assertFalse(d.getEdges().containsKey(b));
+    assertFalse(d.getEdges().containsKey(a));
   }
 }

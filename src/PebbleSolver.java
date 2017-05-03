@@ -6,21 +6,21 @@ import java.util.Queue;
 public class PebbleSolver {
   public RBPMSolution spanningTreeBasedAlgorithm(Graph problem){
     SpanningTree spanningTree = computeSpanningTree(problem);
+    return null; //TODO not done
   }
 
   private SpanningTree computeSpanningTree(Graph problem) {
     return null;
   }
 
-  public Map<StartVertex, TargetVertex> computeAssignmentOnPath(Graph g){
-    //TODO check if graph is a path?
+  public static Map<StartVertex, TargetVertex> computeAssignmentOnPath(PathGraph g){
     Map<StartVertex, TargetVertex> res = new HashMap<>();
     Queue<Vertex> q = new LinkedList<>();
 
-    LinkedList<Vertex> graph = convertGraphToList(g);
+    LinkedList<Vertex> graph = convertPathGraphToList(g);
 
     for(Vertex vert : graph){
-      if(q.peek().getClass() == vert.getClass()){
+      if(q.isEmpty() || q.element().getClass() == vert.getClass()){
         q.add(vert);
       } else {
         if(vert instanceof StartVertex){
@@ -34,39 +34,29 @@ public class PebbleSolver {
     return res;
   }
 
-  private LinkedList<Vertex> convertGraphToList(Graph g) {
+  private static LinkedList<Vertex> convertPathGraphToList(PathGraph g) {
     LinkedList<Vertex> res = new LinkedList<>();
     Vertex v = g.getFirstVertex();
 
-    //Move v to the end of the path
     Vertex prev = v;
-    while(v.getEdges().size() > 1){
-      for (Vertex vertex : v.getEdges().keySet()) {
-        if(!vertex.equals(prev)) {
-          prev = v;
-          v = vertex;
-        }
-      }
-    }
-
-    prev = v;
     res.add(v);
 
-    while(hasNextOnPath(v, prev)){
+    do {
       //Move v to next vertex along the path
       for (Vertex vertex : v.getEdges().keySet()) {
         if (!vertex.equals(prev)) {
           prev = v;
           v = vertex;
           res.add(v);
+          break;
         }
       }
-    }
+    } while(hasNextOnPath(v));
 
     return res;
   }
 
-  private boolean hasNextOnPath(Vertex v, Vertex prev) {
-    return v.getEdges().size() > 1 || v == prev;
+  private static boolean hasNextOnPath(Vertex v) {
+    return v.getEdges().size() > 1;
   }
 }

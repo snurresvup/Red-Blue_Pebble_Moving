@@ -1,20 +1,31 @@
 import java.util.*;
 
-public class Vertex {
+public abstract class Vertex {
   private String name;
   private Map<Vertex, Integer> edges;
   private Pebble[] pebbles;
+  private boolean blueStart;
 
   public Vertex(){
     name = UUID.randomUUID().toString();
     edges = new HashMap<>();
     pebbles = new Pebble[Settings.COLORS];
+    blueStart = false;
+  }
+
+  public Vertex(boolean blueStart){
+    this();
+    this.blueStart = blueStart;
   }
 
   public void addEdge(Vertex connection, int weight) {
     if(this == connection) return;
     edges.put(connection, weight);
     if(!connection.hasEdgeTo(this)) connection.addEdge(this, weight);
+  }
+
+  public void addEdge(Map.Entry<Vertex,Integer> edge){
+    addEdge(edge.getKey(), edge.getValue());
   }
 
   public boolean hasEdgeTo(Vertex connection){

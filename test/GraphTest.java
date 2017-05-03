@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,8 +15,8 @@ public class GraphTest {
   @BeforeEach
   public void setup(){
     graph = new Graph();
-    vertex1 = new Vertex();
-    baseVertex = new Vertex();
+    vertex1 = new StartVertex(new Pebble(PebbleColor.RED));
+    baseVertex = new TargetVertex();
     graph.addVertex(baseVertex);
   }
 
@@ -26,14 +27,14 @@ public class GraphTest {
 
   @Test
   public void shouldBeAbleToAddVertexWithConnection(){
-    HashSet<Vertex> connection = new HashSet<>();
-    connection.add(baseVertex);
+    HashMap<Vertex,Integer> connection = new HashMap<>();
+    connection.put(baseVertex, 1);
     graph.addVertex(vertex1, connection);
   }
 
   @Test
   public void shouldBeAbleToAddConnection(){
-    graph.addConnection(baseVertex, vertex1);
-    assertNotNull(graph.getFirstVertex().getEdges().stream().findAny().orElse(null));
+    graph.addConnection(baseVertex, vertex1, 1);
+    assertNotNull(graph.getFirstVertex().getEdges().keySet().stream().findAny().orElse(null));
   }
 }

@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import java.util.*;
@@ -19,9 +17,9 @@ public class Graph{
     vertices.add(vertex);
   }
 
-  public void addVertex(Vertex addedVertex, Set<Vertex> connections) {
-    for(Vertex connection : connections){
-      if(vertices.contains(connection)) addedVertex.addEdge(connection);
+  public void addVertex(Vertex addedVertex, Map<Vertex,Integer> connections) {
+    for(Map.Entry<Vertex,Integer> connection : connections.entrySet()){
+      if(vertices.contains(connection.getKey())) addedVertex.addEdge(connection);
     }
     vertices.add(addedVertex);
   }
@@ -33,11 +31,11 @@ public class Graph{
    * @param vertexB other endpoint of the connection
    * @return A boolean value indicating whether the connection was added.
    */
-  public boolean addConnection(Vertex vertexA, Vertex vertexB) {
+  public boolean addConnection(Vertex vertexA, Vertex vertexB, int weight) {
     if(!vertices.contains(vertexA) || !vertices.contains(vertexB)) return false;
     if(vertexA.hasEdgeTo(vertexB)) return false;
     if(vertexB.hasEdgeTo(vertexA)) return false;
-    vertexA.addEdge(vertexB);
+    vertexA.addEdge(vertexB, weight);
     return true;
   }
 
@@ -48,7 +46,7 @@ public class Graph{
 
     Set<Edge> addedEdges = new HashSet<>();
     for(Vertex v : vertices){
-      v.getEdges().stream().forEach(vert -> {
+      v.getEdges().keySet().forEach(vert -> {
         Edge newEdge = new Edge(v, vert);
         addedEdges.add(newEdge);
       });

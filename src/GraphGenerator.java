@@ -1,6 +1,4 @@
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class GraphGenerator {
   public static Graph generateRandomGraph(int numberOfPebbles) {
@@ -8,13 +6,18 @@ public class GraphGenerator {
 
     Random r = new Random();
 
+    ArrayList<Pebble> pebbles = new ArrayList<>();
+    for (int i = 0; i < numberOfPebbles; i++) {
+      pebbles.add(new Pebble(PebbleColor.RED));
+    }
+
     Set<Vertex> startVertices = new HashSet<>();
     Set<Vertex> targetVertices = new HashSet<>();
 
 
     for (int i = 0; i < numberOfPebbles; i++) {
-      Vertex start = new Vertex();
-      Vertex target = new Vertex();
+      Vertex start = new StartVertex(pebbles.get(i));
+      Vertex target = new TargetVertex();
       startVertices.add(start);
       targetVertices.add(target);
       res.addVertex(start);
@@ -28,7 +31,7 @@ public class GraphGenerator {
       allVertices.stream().forEach(
           vert -> {
             if (r.nextBoolean()) {
-              vert.addEdge(v);
+              vert.addEdge(v, r.nextInt(10));
             }
           });
     }
@@ -38,16 +41,21 @@ public class GraphGenerator {
 
   public static Graph generateCompletelyConnectedGraph(int numberOfPebbles){
     Graph res = new Graph();
-    Set<Vertex> vertices = new HashSet<>();
+    ArrayList<Pebble> pebbles = new ArrayList<>();
     for (int i = 0; i < numberOfPebbles; i++) {
-      Vertex st = new Vertex();
-      Vertex tg = new Vertex();
+      pebbles.add(new Pebble(PebbleColor.RED));
+    }
+    Set<Vertex> vertices = new HashSet<>();
+
+    for (int i = 0; i < numberOfPebbles; i++) {
+      Vertex st = new StartVertex(pebbles.get(i));
+      Vertex tg = new TargetVertex();
       res.addVertex(st);
       res.addVertex(tg);
       vertices.add(st); vertices.add(tg);
     }
     for(Vertex v: vertices){
-      vertices.stream().forEach(vertex -> v.addEdge(vertex));
+      vertices.stream().forEach(vertex -> v.addEdge(vertex, 1));
     }
     return res;
   }

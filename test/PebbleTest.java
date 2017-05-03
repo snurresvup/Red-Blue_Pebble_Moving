@@ -12,8 +12,7 @@ public class PebbleTest {
   @BeforeEach
   public void setup(){
     bluePebble = new Pebble(PebbleColor.BLUE);
-    blueStartVertex = new Vertex();
-    blueStartVertex.addPebble(bluePebble);
+    blueStartVertex = new StartVertex(bluePebble);
   }
 
 
