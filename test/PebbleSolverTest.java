@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PebbleSolverTest {
@@ -12,12 +13,15 @@ public class PebbleSolverTest {
 
   @BeforeEach
   public void setup(){
-    pathGraph = new PathGraph();
+    Pebble bluePebble = new Pebble(PebbleColor.BLUE);
+    pathGraph = new PathGraph(bluePebble);
     Pebble pA = new Pebble(PebbleColor.RED), pB = new Pebble(PebbleColor.RED);
     a = new StartVertex(pA);
     b = new StartVertex(pB);
     c = new TargetVertex();
     d = new TargetVertex();
+
+    bluePebble.setCurrentVertex(a);
 
     a.addEdge(b,1);
     b.addEdge(c,1);
@@ -39,5 +43,11 @@ public class PebbleSolverTest {
     Map<StartVertex, TargetVertex> res = PebbleSolver.computeAssignmentOnPath(pathGraph);
     assertEquals(c,res.get(a));
     assertEquals(d,res.get(b));
+  }
+
+  @Test
+  public void shouldCalculateASolution(){
+    RBPMSolution solution = PebbleSolver.computeSolution(pathGraph);
+    assertNotNull(solution);
   }
 }

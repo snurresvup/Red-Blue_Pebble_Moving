@@ -4,8 +4,10 @@ import java.util.*;
 
 public class Graph{
   private Set<Vertex> vertices;
+  private Pebble bluePebble;
 
-  public Graph(){
+  public Graph(Pebble bluePebble){
+    this.bluePebble = bluePebble;
     vertices = new HashSet<>();
   }
 
@@ -57,4 +59,7 @@ public class Graph{
     vGraph.display();
   }
 
+  public Pebble getBluePebble() {
+    return bluePebble;
+  }
 }

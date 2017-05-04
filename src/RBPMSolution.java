@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class RBPMSolution extends ArrayList<RBPMSolution.RBPMTuple>{
 
-  public class RBPMTuple {
+  public static class RBPMTuple {
     private Vertex from;
     private Vertex to;
     private boolean carrying;

@@ -3,6 +3,10 @@ import java.util.Set;
 
 public class PathGraph extends Graph {
 
+  public PathGraph(Pebble bluePebble) {
+    super(bluePebble);
+  }
+
   @Override
   public void addVertex(Vertex addedVertex, Map<Vertex, Integer> connections) {
     if(connections.size() > 2) {

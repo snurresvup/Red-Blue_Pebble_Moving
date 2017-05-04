@@ -14,7 +14,7 @@ public class GraphTest {
 
   @BeforeEach
   public void setup(){
-    graph = new Graph();
+    graph = new Graph(new Pebble(PebbleColor.BLUE));
     vertex1 = new StartVertex(new Pebble(PebbleColor.RED));
     baseVertex = new TargetVertex();
     graph.addVertex(baseVertex);

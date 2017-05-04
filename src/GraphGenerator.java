@@ -2,7 +2,7 @@ import java.util.*;
 
 public class GraphGenerator {
   public static Graph generateRandomGraph(int numberOfPebbles) {
-    Graph res = new Graph();
+    Graph res = new Graph(new Pebble(PebbleColor.BLUE));
 
     Random r = new Random();
 
@@ -40,7 +40,7 @@ public class GraphGenerator {
   }
 
   public static Graph generateCompletelyConnectedGraph(int numberOfPebbles){
-    Graph res = new Graph();
+    Graph res = new Graph(new Pebble(PebbleColor.BLUE));
     ArrayList<Pebble> pebbles = new ArrayList<>();
     for (int i = 0; i < numberOfPebbles; i++) {
       pebbles.add(new Pebble(PebbleColor.RED));

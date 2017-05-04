@@ -6,6 +6,7 @@ public class SpanningTree extends Graph{
   private Graph origin;
 
   public SpanningTree(Graph origin, SpanningTreeType type){
+    super(origin.getBluePebble());
     this.origin = origin;
 
     switch (type){

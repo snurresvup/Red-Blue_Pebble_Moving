@@ -4,6 +4,7 @@ public class StartVertex extends Vertex {
   public StartVertex(Pebble originalPebble){
     super();
     assignOriginalRedPebble(originalPebble);
+    addPebble(originalPebble);
   }
 
   public StartVertex(Pebble originalPebble, boolean blueStart){
