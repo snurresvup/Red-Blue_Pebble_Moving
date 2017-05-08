@@ -14,7 +14,7 @@ public class StartVertex extends Vertex {
 
   private void assignOriginalRedPebble(Pebble originalPebble) {
     if(originalPebble.getColor() == PebbleColor.BLUE) {
-      throw new IllegalArgumentException("Originam pebble may not be blue");
+      throw new IllegalArgumentException("Original pebble cannot be blue");
     }
     this.originalPebble = originalPebble;
   }

@@ -14,25 +14,69 @@ public class PebbleSolver {
   }
 
 
+  public static RBPMSolution computeFastSolution(PathGraph pathGraph){
+    LinkedList<Vertex> graph = convertPathGraphToList(pathGraph);
+    Map<StartVertex, TargetVertex> assignment = computeAssignmentOnPath(pathGraph);
+
+    Pebble bluePebble = pathGraph.getBluePebble();
+    Vertex blueStartVertex = bluePebble.getOriginalVertex();
+    int blueStartIndex = graph.indexOf(blueStartVertex);
+
+    LinkedList<Vertex> leftSubProblem = new LinkedList<>(graph.subList(0, blueStartIndex+1));
+    LinkedList<Vertex> rightSubProblem = new LinkedList<>(graph.subList(blueStartIndex, graph.size()));
+
+    Collections.reverse(rightSubProblem);
+
+    RBPMSolution solution;
+
+    double leftPebbleOverflow = getNumberOfPebblesInGraph(leftSubProblem) - getNumberOfTargetPositionsInGraph(leftSubProblem);
+
+    if(leftPebbleOverflow > 0){
+      solution = computeSolution(leftSubProblem, graph, assignment, bluePebble);
+      solution.addAll(computeSolution(rightSubProblem, graph, assignment, bluePebble));
+    } else {
+      solution = computeSolution(rightSubProblem, graph, assignment, bluePebble);
+      solution.addAll(computeSolution(leftSubProblem, graph, assignment, bluePebble));
+    }
+
+    return solution;
+  }
+
+  private static double getNumberOfTargetPositionsInGraph(LinkedList<Vertex> leftSubProblem) {
+    return leftSubProblem.stream().filter(v -> v instanceof TargetVertex).count();
+  }
+
+  private static double getNumberOfPebblesInGraph(LinkedList<Vertex> leftSubProblem) {
+    return leftSubProblem.stream().filter(v -> v.getPebble(PebbleColor.RED) != null).count();
+  }
+
   public static RBPMSolution computeSolution(PathGraph pathGraph){
-    RBPMSolution solution = new RBPMSolution();
     LinkedList<Vertex> graph = convertPathGraphToList(pathGraph);
     Map<StartVertex, TargetVertex> assignment = computeAssignmentOnPath(pathGraph);
     Pebble bluePebble = pathGraph.getBluePebble();
 
-    for (int i = 0; i < assignment.size(); i++) {
-      Pebble r = findLeftMostFreePebble(graph, assignment);
+    return computeSolution(graph, assignment, bluePebble);
+  }
 
-      int blueIndex = graph.indexOf(bluePebble.getCurrentVertex());
-      int rIndex = graph.indexOf(r.getCurrentVertex());
+  private static RBPMSolution computeSolution(LinkedList<Vertex> graph, Map<StartVertex, TargetVertex> assignment, Pebble bluePebble){
+    return computeSolution(graph, graph, assignment, bluePebble);
+  }
+
+  private static RBPMSolution computeSolution(LinkedList<Vertex> subGraph, LinkedList<Vertex> originalGraph, Map<StartVertex, TargetVertex> assignment, Pebble bluePebble) {
+    RBPMSolution solution = new RBPMSolution();
+    for (int i = 0; i < getNumberOfPebblesInGraph(subGraph); i++) {
+      Pebble r = findLeftMostFreePebble(subGraph, assignment);
+
+      int blueIndex = originalGraph.indexOf(bluePebble.getCurrentVertex());
+      int rIndex = subGraph.indexOf(r.getCurrentVertex());
       int direction = Integer.signum(rIndex - blueIndex);
 
-      if(blueIndex != rIndex) transitionToRedPebble(solution, graph, assignment, bluePebble, r, direction);
+      if(blueIndex != rIndex) transitionToRedPebble(solution, originalGraph, assignment, bluePebble, r, direction);
 
-      moveRedPebbleToTarget(r, graph, assignment, solution);
+      moveRedPebbleToTarget(r, originalGraph, assignment, solution);
     }
 
-    movePebbleToOrigin(bluePebble, graph, solution);
+    movePebbleToOrigin(bluePebble, originalGraph, solution);
 
     return solution;
   }
