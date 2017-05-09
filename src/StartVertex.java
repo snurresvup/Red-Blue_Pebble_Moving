@@ -10,6 +10,7 @@ public class StartVertex extends Vertex {
   public StartVertex(Pebble originalPebble, boolean blueStart){
     super(blueStart);
     assignOriginalRedPebble(originalPebble);
+    addPebble(originalPebble);
   }
 
   private void assignOriginalRedPebble(Pebble originalPebble) {

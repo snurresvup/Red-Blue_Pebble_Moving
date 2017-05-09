@@ -41,6 +41,8 @@ public class PebbleSolver {
       solution.addAll(computeSolution(leftSubProblem, graph, assignment, bluePebble));
     }
 
+    movePebbleToOrigin(bluePebble, graph, solution);
+
     return solution;
   }
 
@@ -61,7 +63,9 @@ public class PebbleSolver {
   }
 
   private static RBPMSolution computeSolution(LinkedList<Vertex> graph, Map<StartVertex, TargetVertex> assignment, Pebble bluePebble){
-    return computeSolution(graph, graph, assignment, bluePebble);
+    RBPMSolution solution = computeSolution(graph, graph, assignment, bluePebble);
+    movePebbleToOrigin(bluePebble, graph, solution);
+    return solution;
   }
 
   private static RBPMSolution computeSolution(LinkedList<Vertex> subGraph, LinkedList<Vertex> originalGraph, Map<StartVertex, TargetVertex> assignment, Pebble bluePebble) {
@@ -79,8 +83,8 @@ public class PebbleSolver {
 
       moveRedPebbleToTarget(r, originalGraph, assignment, solution);
     }
-
-    movePebbleToOrigin(bluePebble, originalGraph, solution);
+    //Moved outside for reuse
+    //movePebbleToOrigin(bluePebble, originalGraph, solution);
 
     return solution;
   }

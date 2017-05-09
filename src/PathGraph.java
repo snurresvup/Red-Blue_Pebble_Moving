@@ -42,6 +42,7 @@ public class PathGraph extends Graph {
         if(!vertex.equals(prev)) {
           prev = v;
           v = vertex;
+          break;
         }
       }
     }

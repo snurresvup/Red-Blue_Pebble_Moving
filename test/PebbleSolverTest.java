@@ -1,5 +1,6 @@
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -10,13 +11,19 @@ public class PebbleSolverTest {
   private PathGraph pathGraph;
   private Vertex a,b,c,d;
 
+  private PathGraph pathGraph2;
+  private StartVertex sa, sb, sc, sd;
+  private TargetVertex ta, tb, tc, td;
+
   @Before
   public void setup(){
     Pebble bluePebble = new Pebble(PebbleColor.BLUE);
     pathGraph = new PathGraph(bluePebble);
-    Pebble pA = new Pebble(PebbleColor.RED), pB = new Pebble(PebbleColor.RED);
-    a = new StartVertex(pA);
-    b = new StartVertex(pB);
+    Pebble pebbleA = new Pebble(PebbleColor.RED), pebbleB = new Pebble(PebbleColor.RED);
+    Pebble pA = new Pebble(PebbleColor.RED), pB = new Pebble(PebbleColor.RED), pC = new Pebble(PebbleColor.RED), pD = new Pebble(PebbleColor.RED);
+    Pebble bluePebble2 = new Pebble(PebbleColor.BLUE);
+    a = new StartVertex(pebbleA);
+    b = new StartVertex(pebbleB);
     c = new TargetVertex();
     d = new TargetVertex();
 
@@ -30,6 +37,38 @@ public class PebbleSolverTest {
     pathGraph.addVertex(b);
     pathGraph.addVertex(c);
     pathGraph.addVertex(d);
+
+    pathGraph2 = new PathGraph(bluePebble2);
+    sa = new StartVertex(pA);
+    sb = new StartVertex(pB, true);
+    bluePebble2.setCurrentVertex(sb);
+    sb.addPebble(bluePebble2);
+
+    sc = new StartVertex(pC);
+    sd = new StartVertex(pD);
+
+    ta = new TargetVertex();
+    tb = new TargetVertex();
+    tc = new TargetVertex();
+    td = new TargetVertex();
+
+    ta.addEdge(sa,1);
+    sa.addEdge(tb, 1);
+    tb.addEdge(sb,1);
+    sb.addEdge(tc,1);
+    tc.addEdge(sc,1);
+    sc.addEdge(td,1);
+    td.addEdge(sd,1);
+
+    pathGraph2.addVertex(ta);
+    pathGraph2.addVertex(sa);
+    pathGraph2.addVertex(tb);
+    pathGraph2.addVertex(sb);
+    pathGraph2.addVertex(tc);
+    pathGraph2.addVertex(sc);
+    pathGraph2.addVertex(td);
+    pathGraph2.addVertex(sd);
+
   }
 
   @Test
@@ -141,5 +180,19 @@ public class PebbleSolverTest {
     assertEquals(b, solution.get(9).getFrom());
     assertEquals(a, solution.get(9).getTo());
     assertFalse(solution.get(9).isCarrying());
+  }
+
+  @Test
+  public void shouldComputeFasterSolution(){
+    RBPMSolution solution = PebbleSolver.computeFastSolution(pathGraph2);
+    assertEquals(14, solution.size());
+  }
+
+  @Ignore
+  @Test
+  public void shouldBeWorseWithOldAlgorithm(){
+    //This test may fail because the problem may be reversed due to hash values
+    RBPMSolution solution = PebbleSolver.computeSolution(pathGraph2);
+    assertTrue(solution.size() > 14);
   }
 }
