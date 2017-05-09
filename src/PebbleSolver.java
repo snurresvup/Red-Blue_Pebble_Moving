@@ -26,6 +26,8 @@ public class PebbleSolver {
     LinkedList<Vertex> rightSubProblem = new LinkedList<>(graph.subList(blueStartIndex, graph.size()));
 
     Collections.reverse(rightSubProblem);
+    LinkedList<Vertex> reversedOriginalGraph = new LinkedList<>(graph);
+    Collections.reverse(reversedOriginalGraph);
 
     RBPMSolution solution;
 
@@ -33,9 +35,9 @@ public class PebbleSolver {
 
     if(leftPebbleOverflow > 0){
       solution = computeSolution(leftSubProblem, graph, assignment, bluePebble);
-      solution.addAll(computeSolution(rightSubProblem, graph, assignment, bluePebble));
+      solution.addAll(computeSolution(rightSubProblem, reversedOriginalGraph, assignment, bluePebble));
     } else {
-      solution = computeSolution(rightSubProblem, graph, assignment, bluePebble);
+      solution = computeSolution(rightSubProblem, reversedOriginalGraph, assignment, bluePebble);
       solution.addAll(computeSolution(leftSubProblem, graph, assignment, bluePebble));
     }
 
@@ -65,7 +67,9 @@ public class PebbleSolver {
   private static RBPMSolution computeSolution(LinkedList<Vertex> subGraph, LinkedList<Vertex> originalGraph, Map<StartVertex, TargetVertex> assignment, Pebble bluePebble) {
     RBPMSolution solution = new RBPMSolution();
     for (int i = 0; i < getNumberOfPebblesInGraph(subGraph); i++) {
-      Pebble r = findLeftMostFreePebble(subGraph, assignment);
+      Pebble r = findLeftMostFreePebble(subGraph, originalGraph, assignment);
+
+      if(r == null) continue;
 
       int blueIndex = originalGraph.indexOf(bluePebble.getCurrentVertex());
       int rIndex = subGraph.indexOf(r.getCurrentVertex());
@@ -89,7 +93,7 @@ public class PebbleSolver {
     int originIndex = graph.indexOf(originVertex);
 
     int direction = Integer.signum(originIndex - currentIndex);
-
+    if(direction == 0) return;
 
     Iterator<Vertex> iterator;
     if(direction < 0){
@@ -106,6 +110,7 @@ public class PebbleSolver {
 
     Vertex currentVertex;
     do {
+      if(!iterator.hasNext()) throw new RuntimeException("PANIC!!!");
       currentVertex = iterator.next();
       solution.add(
           new RBPMSolution.RBPMTuple(
@@ -201,10 +206,10 @@ public class PebbleSolver {
     return !redPebbleGoingRight && !goingRight && graph.get(bluePosition - 1).getPebble(PebbleColor.RED) == null;
   }
 
-  private static Pebble findLeftMostFreePebble(LinkedList<Vertex> graph, Map<StartVertex, TargetVertex> assignment) {
-    for(Vertex candidateVertex : graph){
+  private static Pebble findLeftMostFreePebble(LinkedList<Vertex> searchedGraph, LinkedList<Vertex> originalGraph, Map<StartVertex, TargetVertex> assignment) {
+    for(Vertex candidateVertex : searchedGraph){
       Pebble candidatePebble = candidateVertex.getPebble(PebbleColor.RED);
-      if(candidatePebble != null && isFreePebble(candidatePebble, graph, assignment)){
+      if(candidatePebble != null && isFreePebble(candidatePebble, originalGraph, assignment)){
         return candidatePebble;
       }
     }

@@ -96,4 +96,50 @@ public class PebbleSolverTest {
     assertFalse(solution.get(9).isCarrying());
 
   }
+
+  @Test
+  public void shouldComputeFastSolution(){
+    RBPMSolution solution = PebbleSolver.computeFastSolution(pathGraph);
+    assertNotNull(solution);
+    assertEquals(10, solution.size());
+    assertEquals(a, solution.get(0).getFrom());
+    assertEquals(b, solution.get(0).getTo());
+    assertFalse(solution.get(0).isCarrying());
+
+    assertEquals(b, solution.get(1).getFrom());
+    assertEquals(c, solution.get(1).getTo());
+    assertTrue(solution.get(1).isCarrying());
+
+    assertEquals(c, solution.get(2).getFrom());
+    assertEquals(d, solution.get(2).getTo());
+    assertTrue(solution.get(2).isCarrying());
+
+    assertEquals(d, solution.get(3).getFrom());
+    assertEquals(c, solution.get(3).getTo());
+    assertFalse(solution.get(3).isCarrying());
+
+    assertEquals(c, solution.get(4).getFrom());
+    assertEquals(b, solution.get(4).getTo());
+    assertFalse(solution.get(4).isCarrying());
+
+    assertEquals(b, solution.get(5).getFrom());
+    assertEquals(a, solution.get(5).getTo());
+    assertFalse(solution.get(5).isCarrying());
+
+    assertEquals(a, solution.get(6).getFrom());
+    assertEquals(b, solution.get(6).getTo());
+    assertTrue(solution.get(6).isCarrying());
+
+    assertEquals(b, solution.get(7).getFrom());
+    assertEquals(c, solution.get(7).getTo());
+    assertTrue(solution.get(7).isCarrying());
+
+    assertEquals(c, solution.get(8).getFrom());
+    assertEquals(b, solution.get(8).getTo());
+    assertFalse(solution.get(8).isCarrying());
+
+    assertEquals(b, solution.get(9).getFrom());
+    assertEquals(a, solution.get(9).getTo());
+    assertFalse(solution.get(9).isCarrying());
+  }
 }
