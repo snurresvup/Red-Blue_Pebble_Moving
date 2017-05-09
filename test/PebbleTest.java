@@ -1,7 +1,7 @@
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 
 public class PebbleTest {
   private Pebble bluePebble;
@@ -9,10 +9,12 @@ public class PebbleTest {
   private Vertex blueStartVertex;
 
 
-  @BeforeEach
+  @Before
   public void setup(){
     bluePebble = new Pebble(PebbleColor.BLUE);
-    blueStartVertex = new StartVertex(bluePebble);
+    Pebble redPebble = new Pebble(PebbleColor.RED);
+    blueStartVertex = new StartVertex(redPebble, true);
+    blueStartVertex.addPebble(bluePebble);
   }
 
 

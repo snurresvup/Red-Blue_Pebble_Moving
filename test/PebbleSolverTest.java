@@ -1,15 +1,16 @@
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 public class PebbleSolverTest {
   private PathGraph pathGraph;
   private Vertex a,b,c,d;
 
-  @BeforeEach
+  @Before
   public void setup(){
     Pebble bluePebble = new Pebble(PebbleColor.BLUE);
     pathGraph = new PathGraph(bluePebble);

@@ -1,10 +1,9 @@
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertNotNull;
 
 public class GraphTest {
   private Graph graph;
@@ -12,12 +11,13 @@ public class GraphTest {
   private Vertex vertex1;
   private Vertex baseVertex;
 
-  @BeforeEach
+  @Before
   public void setup(){
     graph = new Graph(new Pebble(PebbleColor.BLUE));
     vertex1 = new StartVertex(new Pebble(PebbleColor.RED));
     baseVertex = new TargetVertex();
     graph.addVertex(baseVertex);
+    graph.addVertex(vertex1);
   }
 
   @Test

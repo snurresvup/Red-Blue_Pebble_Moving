@@ -1,8 +1,7 @@
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 public class VertexTest {
   private Vertex vertex1;
@@ -10,7 +9,7 @@ public class VertexTest {
 
   private Pebble bluePebble;
 
-  @BeforeEach
+  @Before
   public void setup(){
     vertex1 = new StartVertex(new Pebble(PebbleColor.RED));
     vertex2 = new TargetVertex();
@@ -34,8 +33,8 @@ public class VertexTest {
   @Test
   public void shouldBeAbleToAddPebble(){
     Pebble pebble = new Pebble(PebbleColor.RED);
-    vertex2.addPebble(pebble);
-    Pebble foundPebble = vertex2.getPebble(PebbleColor.RED);
+    vertex1.replacePebble(pebble);
+    Pebble foundPebble = vertex1.getPebble(PebbleColor.RED);
     assertNotNull(foundPebble);
     assertEquals(PebbleColor.RED, foundPebble.getColor());
     assertEquals(pebble, foundPebble);
@@ -49,7 +48,7 @@ public class VertexTest {
     assertEquals(bluePebble, containedPebble);
   }
 
-  @Test
+  @Test(expected = RuntimeException.class)
   public void shouldBeAbleToContainDifferentPebbles(){
     Pebble pebble = new Pebble(PebbleColor.RED);
     vertex1.addPebble(pebble);
@@ -63,7 +62,7 @@ public class VertexTest {
     assertEquals(bluePebble, foundPebble2);
   }
 
-  @Test
+  @Test(expected = RuntimeException.class)
   public void shouldOnlyContainOnePebbleOfTheSameColor(){
     Pebble pebble = new Pebble(PebbleColor.BLUE);
     Pebble firstPebble = vertex1.getPebble(PebbleColor.BLUE);

@@ -56,4 +56,9 @@ public abstract class Vertex {
       pebbles[pebble.getColor().ordinal()] = null;
     }
   }
+
+  public void replacePebble(Pebble pebble) {
+    pebbles[pebble.getColor().ordinal()] = pebble;
+    pebble.setCurrentVertex(this);
+  }
 }
