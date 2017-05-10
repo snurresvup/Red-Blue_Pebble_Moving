@@ -97,10 +97,36 @@ public class GraphGenerator {
     return res;
   }
 
+  public static PathGraph generateSimplePathGraph(int numberOfPebbles){
+    Pebble bluePebble = new Pebble(PebbleColor.BLUE);
+    PathGraph res = new PathGraph(bluePebble);
+
+    Vertex prev = new StartVertex(new Pebble(PebbleColor.RED), true);
+    res.addVertex(prev);
+
+    Vertex current;
+
+    for (int i = 0; i < numberOfPebbles - 1; i++) {
+      current = new StartVertex(new Pebble(PebbleColor.RED));
+      current.addEdge(prev, 1);
+      res.addVertex(current);
+      prev = current;
+    }
+    for (int i = 0; i < numberOfPebbles; i++) {
+      current = new TargetVertex();
+      current.addEdge(prev, 1);
+      res.addVertex(current);
+      prev = current;
+    }
+
+    return res;
+  }
+
   public static void main(String[] args) {
     Graph g = generateRandomGraph(3);
     //g = generateCompletelyConnectedGraph(3);
     //g = generateRandomPathGraph(4);
+    g = generateSimplePathGraph(4);
     g.show();
   }
 }
