@@ -60,9 +60,47 @@ public class GraphGenerator {
     return res;
   }
 
+  public static PathGraph generateRandomPathGraph(int numberOfPebbles){
+    if(numberOfPebbles < 1) throw new IllegalArgumentException("The number of pebbles must be greater than 1 for a path graph");
+
+    PathGraph res = new PathGraph(new Pebble(PebbleColor.BLUE));
+
+    LinkedList<Vertex> vertices = new LinkedList<>();
+    Vertex v = new StartVertex(new Pebble(PebbleColor.RED), true);
+    v.addPebble(new Pebble(PebbleColor.BLUE));
+    vertices.add(v);
+    v = new TargetVertex();
+    vertices.add(v);
+
+    for (int i = 0; i < numberOfPebbles - 1; i++) {
+      Pebble pebble = new Pebble(PebbleColor.RED);
+      Vertex st = new StartVertex(pebble);
+      Vertex tg = new TargetVertex();
+      vertices.add(st);
+      vertices.add(tg);
+    }
+
+    Collections.shuffle(vertices);
+
+    Iterator<Vertex> iter = vertices.iterator();
+
+    Vertex prev = iter.next();
+    Vertex current;
+    res.addVertex(prev);
+    while(iter.hasNext()){
+      current = iter.next();
+      prev.addEdge(current, 1);
+      res.addVertex(current);
+      prev = current;
+    }
+
+    return res;
+  }
+
   public static void main(String[] args) {
-    Graph g = generateRandomGraph(2);
-    g = generateCompletelyConnectedGraph(3);
+    Graph g = generateRandomGraph(3);
+    //g = generateCompletelyConnectedGraph(3);
+    //g = generateRandomPathGraph(4);
     g.show();
   }
 }
