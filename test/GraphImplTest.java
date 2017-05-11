@@ -5,15 +5,15 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertNotNull;
 
-public class GraphTest {
-  private Graph graph;
+public class GraphImplTest {
+  private GraphImpl graph;
 
   private Vertex vertex1;
   private Vertex baseVertex;
 
   @Before
   public void setup(){
-    graph = new Graph(new Pebble(PebbleColor.BLUE));
+    graph = new GraphImpl(new Pebble(PebbleColor.BLUE));
     vertex1 = new StartVertex(new Pebble(PebbleColor.RED));
     baseVertex = new TargetVertex();
     graph.addVertex(baseVertex);

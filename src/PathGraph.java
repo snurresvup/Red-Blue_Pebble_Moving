@@ -1,7 +1,6 @@
 import java.util.Map;
-import java.util.Set;
 
-public class PathGraph extends Graph {
+public class PathGraph extends GraphImpl {
 
   public PathGraph(Pebble bluePebble) {
     super(bluePebble);

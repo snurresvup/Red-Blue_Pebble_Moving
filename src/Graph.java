@@ -1,30 +1,11 @@
-import org.graphstream.graph.implementations.SingleGraph;
+import java.util.Map;
 
-import java.util.*;
+public interface Graph {
+  Vertex getFirstVertex();
 
-public class Graph{
-  private Set<Vertex> vertices;
-  private Pebble bluePebble;
+  void addVertex(Vertex vertex);
 
-  public Graph(Pebble bluePebble){
-    this.bluePebble = bluePebble;
-    vertices = new HashSet<>();
-  }
-
-  public Vertex getFirstVertex() {
-    return vertices.stream().findFirst().orElse(null);
-  }
-
-  public void addVertex(Vertex vertex) {
-    vertices.add(vertex);
-  }
-
-  public void addVertex(Vertex addedVertex, Map<Vertex,Integer> connections) {
-    for(Map.Entry<Vertex,Integer> connection : connections.entrySet()){
-      if(vertices.contains(connection.getKey())) addedVertex.addEdge(connection);
-    }
-    vertices.add(addedVertex);
-  }
+  void addVertex(Vertex addedVertex, Map<Vertex,Integer> connections);
 
   /**
    * Adds a connection between vertexA and vertexB
@@ -33,33 +14,9 @@ public class Graph{
    * @param vertexB other endpoint of the connection
    * @return A boolean value indicating whether the connection was added.
    */
-  public boolean addConnection(Vertex vertexA, Vertex vertexB, int weight) {
-    if(!vertices.contains(vertexA) || !vertices.contains(vertexB)) return false;
-    if(vertexA.hasEdgeTo(vertexB)) return false;
-    if(vertexB.hasEdgeTo(vertexA)) return false;
-    vertexA.addEdge(vertexB, weight);
-    return true;
-  }
+  boolean addConnection(Vertex vertexA, Vertex vertexB, int weight);
 
-  public void show(){
-    org.graphstream.graph.Graph vGraph = new SingleGraph("The graph");
-    vGraph.setStrict(false);
-    vGraph.setAutoCreate(true);
+  void show();
 
-    Set<Edge> addedEdges = new HashSet<>();
-    for(Vertex v : vertices){
-      v.getEdges().keySet().forEach(vert -> {
-        Edge newEdge = new Edge(v, vert);
-        addedEdges.add(newEdge);
-      });
-    }
-
-    addedEdges.forEach(edge -> vGraph.addEdge(edge.toString(), edge.getA().toString(), edge.getB().toString()));
-
-    vGraph.display();
-  }
-
-  public Pebble getBluePebble() {
-    return bluePebble;
-  }
+  Pebble getBluePebble();
 }

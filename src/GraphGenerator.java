@@ -1,8 +1,8 @@
 import java.util.*;
 
 public class GraphGenerator {
-  public static Graph generateRandomGraph(int numberOfPebbles) {
-    Graph res = new Graph(new Pebble(PebbleColor.BLUE));
+  public static GraphImpl generateRandomGraph(int numberOfPebbles) {
+    GraphImpl res = new GraphImpl(new Pebble(PebbleColor.BLUE));
 
     Random r = new Random();
 
@@ -39,8 +39,8 @@ public class GraphGenerator {
     return res;
   }
 
-  public static Graph generateCompletelyConnectedGraph(int numberOfPebbles){
-    Graph res = new Graph(new Pebble(PebbleColor.BLUE));
+  public static GraphImpl generateCompletelyConnectedGraph(int numberOfPebbles){
+    GraphImpl res = new GraphImpl(new Pebble(PebbleColor.BLUE));
     ArrayList<Pebble> pebbles = new ArrayList<>();
     for (int i = 0; i < numberOfPebbles; i++) {
       pebbles.add(new Pebble(PebbleColor.RED));
@@ -123,7 +123,7 @@ public class GraphGenerator {
   }
 
   public static void main(String[] args) {
-    Graph g = generateRandomGraph(3);
+    GraphImpl g = generateRandomGraph(3);
     //g = generateCompletelyConnectedGraph(3);
     //g = generateRandomPathGraph(4);
     g = generateSimplePathGraph(4);

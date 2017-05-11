@@ -1,16 +1,14 @@
-import com.sun.org.apache.regexp.internal.RE;
-
 import java.util.*;
 
 
 public class PebbleSolver {
-  public RBPMSolution spanningTreeBasedAlgorithm(Graph problem){
+  public RBPMSolution spanningTreeBasedAlgorithm(GraphImpl problem){
     SpanningTree spanningTree = computeSpanningTree(problem);
     return null; //TODO not done
   }
 
-  private SpanningTree computeSpanningTree(Graph problem) {
-    return null;
+  private SpanningTree computeSpanningTree(GraphImpl problem) {
+    return new SpanningTree(problem, SpanningTree.SpanningTreeType.BFS);
   }
 
 

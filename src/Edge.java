@@ -1,7 +1,7 @@
-public class Edge {
-  private Vertex a, b;
+public class Edge<T> {
+  private T a, b;
 
-  public Edge(Vertex a, Vertex b){
+  public Edge(T a, T b){
     this.a = a;
     this.b = b;
   }
@@ -21,11 +21,11 @@ public class Edge {
     return a.hashCode() + b.hashCode();
   }
 
-  public Vertex getA() {
+  public T getA() {
     return a;
   }
 
-  public Vertex getB() {
+  public T getB() {
     return b;
   }
 }
