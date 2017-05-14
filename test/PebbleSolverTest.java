@@ -195,4 +195,10 @@ public class PebbleSolverTest {
     RBPMSolution solution = PebbleSolver.computeSolution(pathGraph2);
     assertTrue(solution.size() > 14);
   }
+
+  @Test
+  public void spanningTreeAlgoShouldWorkOnPath(){
+    RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(pathGraph);
+    System.out.println(solution);
+  }
 }

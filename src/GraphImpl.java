@@ -62,4 +62,9 @@ public class GraphImpl implements Graph {
   public Pebble getBluePebble() {
     return bluePebble;
   }
+
+  @Override
+  public Set<Vertex> getVertices() {
+    return vertices;
+  }
 }

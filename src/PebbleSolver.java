@@ -1,13 +1,144 @@
+import javafx.util.Pair;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class PebbleSolver {
-  public RBPMSolution spanningTreeBasedAlgorithm(GraphImpl problem){
+  public static RBPMSolution spanningTreeBasedAlgorithm(GraphImpl problem){
+    RBPMSolution solution = new RBPMSolution();
     SpanningTree spanningTree = computeSpanningTree(problem);
-    return null; //TODO not done
+    SpanningTreeVertex leaf = spanningTree.getLeaf();
+
+    while(!spanningTree.isEmpty()) {
+      if (leaf.getModelee() instanceof StartVertex) {
+        if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
+          //Start vertex with red pebble
+          SpanningTreeVertex closestEmptyVertex = spanningTree.findClosestEmptyVertex(leaf);
+          solution.addAll(shiftAllOnPath(leaf, closestEmptyVertex, spanningTree));
+        } else {
+          //Empty start vertex
+        }
+      } else if (leaf.getModelee() instanceof TargetVertex) {
+        if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
+          //Target vertex with red pebble
+        } else {
+          //Empty target vertex
+          SpanningTreeVertex closestPebble = spanningTree.findClosestPebble(leaf);
+          solution.addAll(moveRedPebbleToVertex(closestPebble.getModelee().getPebble(PebbleColor.RED), leaf.getModelee(), problem));
+        }
+      }
+      spanningTree.removeLeaf(leaf);
+      leaf = spanningTree.getLeaf();
+    }
+
+    return solution;
   }
 
-  private SpanningTree computeSpanningTree(GraphImpl problem) {
+  private static RBPMSolution shiftAllOnPath(SpanningTreeVertex from, SpanningTreeVertex to, SpanningTree spanningTree) {
+    Pebble bluePebble = from.getModelee().getPebble(PebbleColor.BLUE);
+    if(bluePebble == null) throw new IllegalArgumentException("Blue pebble must be at from vertex");
+
+    LinkedList<SpanningTreeVertex> path = spanningTree.getPath(from, to, null);
+
+    RBPMSolution solution = moveBluePebbleToVertex(bluePebble, path.get(path.size()-2).getModelee(), spanningTree.getOrigin());
+
+    ListIterator<SpanningTreeVertex> listIterator = path.listIterator(path.size()-1);
+
+    SpanningTreeVertex currentEmptyVertex = listIterator.next();
+    listIterator.previous();
+    SpanningTreeVertex current = listIterator.previous();
+    solution.add(new RBPMSolution.RBPMTuple(current.getModelee(), currentEmptyVertex.getModelee(), true));
+    solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex.getModelee(), current.getModelee(), false));
+
+    while (listIterator.hasPrevious()){
+      currentEmptyVertex = current;
+      current = listIterator.previous();
+      solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex.getModelee(), current.getModelee(), false));
+      solution.add(new RBPMSolution.RBPMTuple(current.getModelee(), currentEmptyVertex.getModelee(), true));
+      if(listIterator.hasPrevious())solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex.getModelee(), current.getModelee(), false));
+    }
+
+    return solution;
+  }
+
+  private static RBPMSolution moveBluePebbleToVertex(Pebble bluePebble, Vertex destination, Graph graph) {
+    return shortestPath(bluePebble.getCurrentVertex(), destination, graph, false);
+  }
+
+  private static RBPMSolution moveRedPebbleToVertex(Pebble pebble, Vertex destination, Graph graph) {
+    RBPMSolution solution = new RBPMSolution();
+    Vertex pebbleVertex = pebble.getCurrentVertex();
+    Vertex blueVertex = graph.getBluePebble().getCurrentVertex();
+
+    solution.addAll(shortestPath(blueVertex, pebbleVertex, graph, false));
+    solution.addAll(shortestPath(pebbleVertex, destination, graph, true));
+
+    return solution;
+  }
+
+  private static RBPMSolution shortestPath(Vertex fromVertex, Vertex toVertex, Graph graph, boolean carrying) {
+    HashMap<Vertex, Pair<Integer,Vertex>> distances = new HashMap<>();
+    Vertex current = fromVertex;
+    distances.put(fromVertex, new Pair<>(0, null));
+    Set<Vertex> unvisited = new HashSet<>(graph.getVertices());
+    unvisited = unvisited.stream().filter(v -> v.equals(fromVertex)).collect(Collectors.toSet());
+    for(Vertex v : unvisited){
+      distances.put(v, null);
+    }
+
+    while(!unvisited.isEmpty()) {
+      for (Vertex v : current.getEdges().keySet()) {
+        if (distances.get(v) == null) {
+          distances.put(v, new Pair<>(distances.get(current).getKey() + current.getEdges().get(v), current));
+          continue;
+        }
+
+        int distanceCandidate = current.getEdges().get(v) + distances.get(current).getKey();
+        if (distanceCandidate < distances.get(v).getKey()) {
+          distances.put(v, new Pair<>(distanceCandidate, current));
+        }
+      }
+
+      unvisited.remove(current);
+
+      current = unvisited.stream().min(Comparator.comparingInt(s -> distances.get(s).getKey())).get();
+    }
+
+    return backtrack(fromVertex, toVertex, distances, carrying);
+  }
+
+  private static RBPMSolution backtrack(Vertex fromVertex, Vertex toVertex, HashMap<Vertex, Pair<Integer, Vertex>> distances, boolean carrying) {
+    if(fromVertex.equals(toVertex)) throw new IllegalArgumentException("cannot have self loop (from = to)");
+    Pebble bluePebble = fromVertex.getPebble(PebbleColor.BLUE);
+    if(bluePebble == null) throw new IllegalArgumentException("The blue pebble must be at the from vertex");
+    LinkedList<Vertex> path = new LinkedList<>();
+    Vertex current = toVertex;
+    while(!current.equals(fromVertex)) {
+      path.addFirst(current);
+      current = distances.get(current).getValue();
+    }
+
+    RBPMSolution solution = new RBPMSolution();
+    Iterator<Vertex> iterator = path.iterator();
+    Vertex prev = iterator.next();
+    while(iterator.hasNext()){
+      Vertex next = iterator.next();
+      solution.add(new RBPMSolution.RBPMTuple(prev, next, carrying));
+      if(carrying){
+        Pebble redPebble = prev.getPebble(PebbleColor.RED);
+        prev.removePebble(redPebble);
+        next.addPebble(redPebble);
+      }
+      prev.removePebble(bluePebble);
+      next.addPebble(bluePebble);
+      prev = next;
+    }
+
+    return solution;
+  }
+
+  private static SpanningTree computeSpanningTree(GraphImpl problem) {
     return new SpanningTree(problem, SpanningTree.SpanningTreeType.BFS);
   }
 

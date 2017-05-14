@@ -1,4 +1,5 @@
 import java.util.Map;
+import java.util.Set;
 
 public interface Graph {
   Vertex getFirstVertex();
@@ -19,4 +20,6 @@ public interface Graph {
   void show();
 
   Pebble getBluePebble();
+
+  Set<Vertex> getVertices();
 }
