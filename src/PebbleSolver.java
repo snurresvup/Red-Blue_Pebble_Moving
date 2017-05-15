@@ -8,9 +8,11 @@ public class PebbleSolver {
   public static RBPMSolution spanningTreeBasedAlgorithm(GraphImpl problem){
     RBPMSolution solution = new RBPMSolution();
     SpanningTree spanningTree = computeSpanningTree(problem);
-    SpanningTreeVertex leaf = spanningTree.getLeaf();
+    SpanningTreeVertex leaf;
 
     while(!spanningTree.isEmpty()) {
+      leaf = spanningTree.getLeaf();
+
       if (leaf.getModelee() instanceof StartVertex) {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
           //Start vertex with red pebble
@@ -28,9 +30,12 @@ public class PebbleSolver {
           solution.addAll(moveRedPebbleToVertex(closestPebble.getModelee().getPebble(PebbleColor.RED), leaf.getModelee(), problem));
         }
       }
+
       spanningTree.removeLeaf(leaf);
-      leaf = spanningTree.getLeaf();
     }
+
+    Pebble bluePebble = problem.getBluePebble();
+    solution.addAll(shortestPath(bluePebble.getCurrentVertex(), bluePebble.getOriginalVertex(), problem, false));
 
     return solution;
   }
@@ -82,15 +87,16 @@ public class PebbleSolver {
     Vertex current = fromVertex;
     distances.put(fromVertex, new Pair<>(0, null));
     Set<Vertex> unvisited = new HashSet<>(graph.getVertices());
-    unvisited = unvisited.stream().filter(v -> v.equals(fromVertex)).collect(Collectors.toSet());
+    unvisited = unvisited.stream().filter(v -> !v.equals(fromVertex)).collect(Collectors.toSet());
     for(Vertex v : unvisited){
-      distances.put(v, null);
+      distances.put(v, new Pair<>(Integer.MAX_VALUE, null));
     }
 
     while(!unvisited.isEmpty()) {
       for (Vertex v : current.getEdges().keySet()) {
-        if (distances.get(v) == null) {
-          distances.put(v, new Pair<>(distances.get(current).getKey() + current.getEdges().get(v), current));
+        if (distances.get(v).getKey() == Integer.MAX_VALUE) {
+          int currentVal = distances.get(current).getKey();//distances.get(current).getValue() == null ? 0 : distances.get(current).getKey();
+          distances.put(v, new Pair<>(currentVal + current.getEdges().get(v), current));
           continue;
         }
 
@@ -102,7 +108,7 @@ public class PebbleSolver {
 
       unvisited.remove(current);
 
-      current = unvisited.stream().min(Comparator.comparingInt(s -> distances.get(s).getKey())).get();
+      current = unvisited.stream().min(Comparator.comparingInt(s -> distances.get(s).getKey())).orElse(null);
     }
 
     return backtrack(fromVertex, toVertex, distances, carrying);
@@ -114,9 +120,11 @@ public class PebbleSolver {
     if(bluePebble == null) throw new IllegalArgumentException("The blue pebble must be at the from vertex");
     LinkedList<Vertex> path = new LinkedList<>();
     Vertex current = toVertex;
+    path.addFirst(current);
+
     while(!current.equals(fromVertex)) {
-      path.addFirst(current);
       current = distances.get(current).getValue();
+      path.addFirst(current);
     }
 
     RBPMSolution solution = new RBPMSolution();
@@ -259,6 +267,7 @@ public class PebbleSolver {
   }
 
   private static void moveRedPebbleToTarget(Pebble r, LinkedList<Vertex> graph, Map<StartVertex, TargetVertex> assignment, RBPMSolution solution) {
+    if(r.getColor() != PebbleColor.RED) throw new IllegalArgumentException("Can only move red pebble with this method");
     Vertex currentVertex = r.getCurrentVertex();
     Pebble bluePebble = currentVertex.getPebble(PebbleColor.BLUE);
     if(bluePebble == null) throw new IllegalStateException("Cannot move red pebble without blue pebble");

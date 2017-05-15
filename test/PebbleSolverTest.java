@@ -14,23 +14,25 @@ public class PebbleSolverTest {
   private PathGraph pathGraph2;
   private StartVertex sa, sb, sc, sd;
   private TargetVertex ta, tb, tc, td;
+  private Pebble bluePebble;
+  private Pebble pebbleA;
+  private Pebble pebbleB;
 
   @Before
   public void setup(){
-    Pebble bluePebble = new Pebble(PebbleColor.BLUE);
+    bluePebble = new Pebble(PebbleColor.BLUE);
     pathGraph = new PathGraph(bluePebble);
-    Pebble pebbleA = new Pebble(PebbleColor.RED), pebbleB = new Pebble(PebbleColor.RED);
-    Pebble pA = new Pebble(PebbleColor.RED), pB = new Pebble(PebbleColor.RED), pC = new Pebble(PebbleColor.RED), pD = new Pebble(PebbleColor.RED);
-    Pebble bluePebble2 = new Pebble(PebbleColor.BLUE);
+    pebbleA = new Pebble(PebbleColor.RED);
+    pebbleB = new Pebble(PebbleColor.RED);
     a = new StartVertex(pebbleA);
     b = new StartVertex(pebbleB);
     c = new TargetVertex();
     d = new TargetVertex();
 
-    bluePebble.setCurrentVertex(a);
+    a.addPebble(bluePebble);
 
     a.addEdge(b,1);
-    b.addEdge(c,1);
+    b.addEdge(c,14);
     c.addEdge(d,1);
 
     pathGraph.addVertex(a);
@@ -38,6 +40,8 @@ public class PebbleSolverTest {
     pathGraph.addVertex(c);
     pathGraph.addVertex(d);
 
+    Pebble pA = new Pebble(PebbleColor.RED), pB = new Pebble(PebbleColor.RED), pC = new Pebble(PebbleColor.RED), pD = new Pebble(PebbleColor.RED);
+    Pebble bluePebble2 = new Pebble(PebbleColor.BLUE);
     pathGraph2 = new PathGraph(bluePebble2);
     sa = new StartVertex(pA);
     sb = new StartVertex(pB, true);
@@ -199,6 +203,15 @@ public class PebbleSolverTest {
   @Test
   public void spanningTreeAlgoShouldWorkOnPath(){
     RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(pathGraph);
-    System.out.println(solution);
+    reconstructPathGraph();
+    RBPMSolution solution1 = PebbleSolver.computeFastSolution(pathGraph);
+
+    assertEquals(RBPMUtil.length(solution1), RBPMUtil.length(solution));
+  }
+
+  public void reconstructPathGraph(){
+    bluePebble.setCurrentVertex(bluePebble.getOriginalVertex());
+    c.removePebble(pebbleA); d.removePebble(pebbleB);
+    a.addPebble(pebbleA); b.addPebble(pebbleB);
   }
 }
