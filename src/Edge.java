@@ -28,4 +28,13 @@ public class Edge<T> {
   public T getB() {
     return b;
   }
+
+  public T getOther(T v){
+    if(v.equals(a)) return b;
+    return a;
+  }
+
+  public boolean contains(T t){
+    return a.equals(t) || b.equals(t);
+  }
 }

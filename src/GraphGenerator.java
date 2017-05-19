@@ -40,7 +40,8 @@ public class GraphGenerator {
   }
 
   public static GraphImpl generateCompletelyConnectedGraph(int numberOfPebbles){
-    GraphImpl res = new GraphImpl(new Pebble(PebbleColor.BLUE));
+    Pebble bluePebble = new Pebble(PebbleColor.BLUE);
+    GraphImpl res = new GraphImpl(bluePebble);
     ArrayList<Pebble> pebbles = new ArrayList<>();
     for (int i = 0; i < numberOfPebbles; i++) {
       pebbles.add(new Pebble(PebbleColor.RED));
@@ -48,7 +49,8 @@ public class GraphGenerator {
     Set<Vertex> vertices = new HashSet<>();
 
     for (int i = 0; i < numberOfPebbles; i++) {
-      Vertex st = new StartVertex(pebbles.get(i));
+      Vertex st = new StartVertex(pebbles.get(i), i == 0 );
+      if(i == 0) st.addPebble(bluePebble);
       Vertex tg = new TargetVertex();
       res.addVertex(st);
       res.addVertex(tg);
@@ -57,6 +59,7 @@ public class GraphGenerator {
     for(Vertex v: vertices){
       vertices.stream().forEach(vertex -> v.addEdge(vertex, 1));
     }
+
     return res;
   }
 

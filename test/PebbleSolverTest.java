@@ -209,6 +209,12 @@ public class PebbleSolverTest {
     assertEquals(RBPMUtil.length(solution1), RBPMUtil.length(solution));
   }
 
+  @Test
+  public void spanningTreeAlgoShouldWorkOnCCGraph(){
+    RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(GraphGenerator.generateCompletelyConnectedGraph(2));
+    System.out.println(solution);
+  }
+
   public void reconstructPathGraph(){
     bluePebble.setCurrentVertex(bluePebble.getOriginalVertex());
     c.removePebble(pebbleA); d.removePebble(pebbleB);

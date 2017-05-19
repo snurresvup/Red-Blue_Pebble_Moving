@@ -28,10 +28,23 @@ public class PebbleSolver {
           //Empty target vertex
           SpanningTreeVertex closestPebble = spanningTree.findClosestPebble(leaf);
           solution.addAll(moveRedPebbleToVertex(closestPebble.getModelee().getPebble(PebbleColor.RED), leaf.getModelee(), problem));
-        }
-      }
+          Vertex neighboringVertex = null;
 
-      spanningTree.removeLeaf(leaf);
+          for(Edge<SpanningTreeVertex> e : spanningTree.getEdges()){
+            if(e.contains(leaf)) {
+              neighboringVertex = e.getOther(leaf).getModelee();
+              break;
+            }
+          }
+
+          solution.addAll(moveBluePebbleToVertex(
+              problem.getBluePebble()
+              , neighboringVertex
+              , problem));
+        }
+
+        spanningTree.removeLeaf(leaf);
+      }
     }
 
     Pebble bluePebble = problem.getBluePebble();
@@ -115,7 +128,7 @@ public class PebbleSolver {
   }
 
   private static RBPMSolution backtrack(Vertex fromVertex, Vertex toVertex, HashMap<Vertex, Pair<Integer, Vertex>> distances, boolean carrying) {
-    if(fromVertex.equals(toVertex)) throw new IllegalArgumentException("cannot have self loop (from = to)");
+    if(fromVertex.equals(toVertex)) return new RBPMSolution();//throw new IllegalArgumentException("cannot have self loop (from = to)");
     Pebble bluePebble = fromVertex.getPebble(PebbleColor.BLUE);
     if(bluePebble == null) throw new IllegalArgumentException("The blue pebble must be at the from vertex");
     LinkedList<Vertex> path = new LinkedList<>();
