@@ -1,3 +1,4 @@
+import com.sun.org.apache.regexp.internal.RE;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -78,7 +79,7 @@ public class SpanningTree {
 
   public void removeLeaf(SpanningTreeVertex vertex){
     Set<Edge<SpanningTreeVertex>> neighborhood = getNeighborhood(vertex);
-    if(vertex.getModelee().getPebble(PebbleColor.BLUE) != null) throw new IllegalArgumentException("Please panic, you have removed the blue pebble");
+    if(vertex.getModelee().getPebble(PebbleColor.BLUE) != null && leafs.size() > 1) throw new IllegalArgumentException("Please panic, you have removed the blue pebble");
 
     if(!(neighborhood.size() <= 1)) throw new IllegalArgumentException("Vertex is not a leaf, and cannot be removed");
     edges.removeAll(neighborhood);
@@ -135,24 +136,34 @@ public class SpanningTree {
 
   public LinkedList<SpanningTreeVertex> getPath(SpanningTreeVertex from, SpanningTreeVertex to, LinkedList<SpanningTreeVertex> accum) {
     if(accum == null) accum = new LinkedList<>();
-    if(from.equals(to)) return accum;
+    if(from.equals(to)) {
+      accum.add(to);
+      return accum;
+    }
 
     Set<Edge<SpanningTreeVertex>> neighborhood = getNeighborhood(from);
 
     for(Edge<SpanningTreeVertex> edge : neighborhood){
-      SpanningTreeVertex other = edge.getA().equals(from) ? edge.getB() : edge.getA();
-
-      if(accum.getLast() != null && accum.getLast().equals(other)) continue;
+      if(!accum.isEmpty() && accum.getLast() != null && accum.getLast().equals(edge.getOther(from))) continue;
 
       LinkedList<SpanningTreeVertex> nextAccum = new LinkedList<>(accum);
       nextAccum.add(from);
-      LinkedList<SpanningTreeVertex> res = getPath(other, to, nextAccum);
+      LinkedList<SpanningTreeVertex> res = getPath(edge.getOther(from), to, nextAccum);
       if(res == null) continue;
 
       return res;
     }
 
     return null;
+  }
+
+  public boolean noVertexNeedsWork() {
+    for(SpanningTreeVertex spv : vertices){
+      if ((spv.getModelee() instanceof TargetVertex && spv.getModelee().getPebble(PebbleColor.RED) == null)
+          || (spv.getModelee() instanceof StartVertex && spv.getModelee().getPebble(PebbleColor.RED) != null))
+        return false;
+    }
+    return true;
   }
 
   public enum SpanningTreeType {

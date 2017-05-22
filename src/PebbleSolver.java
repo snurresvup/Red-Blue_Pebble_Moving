@@ -17,13 +17,16 @@ public class PebbleSolver {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
           //Start vertex with red pebble
           SpanningTreeVertex closestEmptyVertex = spanningTree.findClosestEmptyVertex(leaf);
+          solution.addAll(moveBluePebbleToVertex(problem.getBluePebble(), leaf.getModelee(), problem));
           solution.addAll(shiftAllOnPath(leaf, closestEmptyVertex, spanningTree));
         } else {
           //Empty start vertex
+          if(spanningTree.noVertexNeedsWork()) break;
         }
       } else if (leaf.getModelee() instanceof TargetVertex) {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
           //Target vertex with red pebble
+          if(spanningTree.noVertexNeedsWork()) break;
         } else {
           //Empty target vertex
           SpanningTreeVertex closestPebble = spanningTree.findClosestPebble(leaf);
@@ -42,9 +45,8 @@ public class PebbleSolver {
               , neighboringVertex
               , problem));
         }
-
-        spanningTree.removeLeaf(leaf);
       }
+      spanningTree.removeLeaf(leaf);
     }
 
     Pebble bluePebble = problem.getBluePebble();
@@ -67,15 +69,24 @@ public class PebbleSolver {
     listIterator.previous();
     SpanningTreeVertex current = listIterator.previous();
     solution.add(new RBPMSolution.RBPMTuple(current.getModelee(), currentEmptyVertex.getModelee(), true));
-    solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex.getModelee(), current.getModelee(), false));
+
+    Pebble pebble = current.getModelee().getPebble(PebbleColor.RED);
+    current.getModelee().removePebble(pebble);
+    currentEmptyVertex.getModelee().addPebble(pebble);
 
     while (listIterator.hasPrevious()){
+      solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex.getModelee(), current.getModelee(), false));
       currentEmptyVertex = current;
       current = listIterator.previous();
       solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex.getModelee(), current.getModelee(), false));
       solution.add(new RBPMSolution.RBPMTuple(current.getModelee(), currentEmptyVertex.getModelee(), true));
-      if(listIterator.hasPrevious())solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex.getModelee(), current.getModelee(), false));
+
+      Pebble p = current.getModelee().getPebble(PebbleColor.RED);
+      current.getModelee().removePebble(p);
+      currentEmptyVertex.getModelee().addPebble(p);
     }
+    bluePebble.getCurrentVertex().removePebble(bluePebble);
+    currentEmptyVertex.getModelee().addPebble(bluePebble);
 
     return solution;
   }

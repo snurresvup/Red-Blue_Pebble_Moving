@@ -48,7 +48,7 @@ public abstract class Vertex {
 
   @Override
   public String toString(){
-    return name;
+    return name.substring(name.length() - 3, name.length());
   }
 
   public void removePebble(Pebble pebble) {

@@ -127,9 +127,9 @@ public class GraphGenerator {
 
   public static void main(String[] args) {
     GraphImpl g = generateRandomGraph(3);
-    //g = generateCompletelyConnectedGraph(3);
+    g = generateCompletelyConnectedGraph(3);
     //g = generateRandomPathGraph(4);
-    g = generateSimplePathGraph(4);
+    //g = generateSimplePathGraph(4);
     g.show();
   }
 }
