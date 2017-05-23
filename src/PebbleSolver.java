@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 
 public class PebbleSolver {
-  public static RBPMSolution spanningTreeBasedAlgorithm(GraphImpl problem){
+  public static RBPMSolution spanningTreeBasedAlgorithm(Graph problem){
     RBPMSolution solution = new RBPMSolution();
     SpanningTree spanningTree = computeSpanningTree(problem);
     SpanningTreeVertex leaf;
@@ -22,6 +22,7 @@ public class PebbleSolver {
         } else {
           //Empty start vertex
           if(spanningTree.noVertexNeedsWork()) break;
+
         }
       } else if (leaf.getModelee() instanceof TargetVertex) {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
@@ -45,6 +46,20 @@ public class PebbleSolver {
               , neighboringVertex
               , problem));
         }
+      }
+
+      Pebble bluePebble = leaf.getModelee().getPebble(PebbleColor.BLUE);
+
+      if(bluePebble != null) {
+        Vertex neighbour = null;
+        for(Edge<SpanningTreeVertex> e : spanningTree.getEdges()){
+          if(e.contains(leaf)) {
+            neighbour = e.getOther(leaf).getModelee();
+            break;
+          }
+        }
+
+        moveBluePebbleToVertex(bluePebble, neighbour, problem);
       }
       spanningTree.removeLeaf(leaf);
     }
@@ -117,6 +132,7 @@ public class PebbleSolver {
     }
 
     while(!unvisited.isEmpty()) {
+      if(current == null) System.out.println("PANIC");
       for (Vertex v : current.getEdges().keySet()) {
         if (distances.get(v).getKey() == Integer.MAX_VALUE) {
           int currentVal = distances.get(current).getKey();//distances.get(current).getValue() == null ? 0 : distances.get(current).getKey();
@@ -133,6 +149,7 @@ public class PebbleSolver {
       unvisited.remove(current);
 
       current = unvisited.stream().min(Comparator.comparingInt(s -> distances.get(s).getKey())).orElse(null);
+
     }
 
     return backtrack(fromVertex, toVertex, distances, carrying);
@@ -170,7 +187,7 @@ public class PebbleSolver {
     return solution;
   }
 
-  private static SpanningTree computeSpanningTree(GraphImpl problem) {
+  private static SpanningTree computeSpanningTree(Graph problem) {
     return new SpanningTree(problem, SpanningTree.SpanningTreeType.BFS);
   }
 

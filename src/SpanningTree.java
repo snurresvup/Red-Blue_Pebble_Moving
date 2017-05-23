@@ -45,7 +45,7 @@ public class SpanningTree {
 
       if(parent != null) {
         edges.add(new Edge<>(currentSTV, parent));
-        leafs.remove(parent);
+        if(parent.getModelee().getEdges().size() > 1) leafs.remove(parent);
       }
 
       for(Vertex v : current.getEdges().keySet()){
@@ -53,6 +53,7 @@ public class SpanningTree {
         if(vertices.contains(new SpanningTreeVertex(v))) continue;
         queue.add(new Pair<>(v, currentSTV));
       }
+
     }
   }
 
@@ -81,7 +82,9 @@ public class SpanningTree {
     Set<Edge<SpanningTreeVertex>> neighborhood = getNeighborhood(vertex);
     if(vertex.getModelee().getPebble(PebbleColor.BLUE) != null && leafs.size() > 1) throw new IllegalArgumentException("Please panic, you have removed the blue pebble");
 
-    if(!(neighborhood.size() <= 1)) throw new IllegalArgumentException("Vertex is not a leaf, and cannot be removed");
+    if(!(neighborhood.size() <= 1)){
+      throw new IllegalArgumentException("Vertex is not a leaf, and cannot be removed. Leafs: " + leafs + " removed leaf: " + vertex.getModelee());
+    }
     edges.removeAll(neighborhood);
     vertices.remove(vertex);
     leafs.remove(vertex);
@@ -89,8 +92,9 @@ public class SpanningTree {
     Iterator<Edge<SpanningTreeVertex>> iter = neighborhood.iterator();
     if(!iter.hasNext()) return;
     Edge<SpanningTreeVertex> danglingEdge = iter.next();
-    SpanningTreeVertex newLeaf = danglingEdge.getA().equals(vertex) ? danglingEdge.getB() : danglingEdge.getA();
-    leafs.add(newLeaf);
+    SpanningTreeVertex newLeaf = danglingEdge.getOther(vertex);
+    long nEdges = edges.stream().filter(e -> e.contains(newLeaf)).count();
+    if(nEdges == 1) leafs.add(newLeaf);
   }
 
   public Set<Edge<SpanningTreeVertex>> getNeighborhood(SpanningTreeVertex vertex) {

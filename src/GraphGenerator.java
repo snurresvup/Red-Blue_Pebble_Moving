@@ -66,11 +66,12 @@ public class GraphGenerator {
   public static PathGraph generateRandomPathGraph(int numberOfPebbles){
     if(numberOfPebbles < 1) throw new IllegalArgumentException("The number of pebbles must be greater than 1 for a path graph");
 
-    PathGraph res = new PathGraph(new Pebble(PebbleColor.BLUE));
+    Pebble bluePebble = new Pebble(PebbleColor.BLUE);
+    PathGraph res = new PathGraph(bluePebble);
 
     LinkedList<Vertex> vertices = new LinkedList<>();
     Vertex v = new StartVertex(new Pebble(PebbleColor.RED), true);
-    v.addPebble(new Pebble(PebbleColor.BLUE));
+    v.addPebble(bluePebble);
     vertices.add(v);
     v = new TargetVertex();
     vertices.add(v);
@@ -105,6 +106,7 @@ public class GraphGenerator {
     PathGraph res = new PathGraph(bluePebble);
 
     Vertex prev = new StartVertex(new Pebble(PebbleColor.RED), true);
+    prev.addPebble(bluePebble);
     res.addVertex(prev);
 
     Vertex current;
