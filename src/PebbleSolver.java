@@ -5,13 +5,13 @@ import java.util.stream.Collectors;
 
 
 public class PebbleSolver {
-  public static RBPMSolution spanningTreeBasedAlgorithm(Graph problem){
+  public static RBPMSolution spanningTreeBasedAlgorithm(Graph problem, boolean minSpanTree, boolean prioLeaf){
     RBPMSolution solution = new RBPMSolution();
-    SpanningTree spanningTree = computeSpanningTree(problem);
+    SpanningTree spanningTree = minSpanTree ? computeMinimumSpanningTree(problem) : computeSpanningTree(problem);
     SpanningTreeVertex leaf;
 
     while(!spanningTree.isEmpty()) {
-      leaf = spanningTree.getLeaf();
+      leaf = prioLeaf ? spanningTree.getPrioritizedLeaf() : spanningTree.getLeaf();
 
       if (leaf.getModelee() instanceof StartVertex) {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
@@ -191,6 +191,9 @@ public class PebbleSolver {
     return new SpanningTree(problem, SpanningTree.SpanningTreeType.BFS);
   }
 
+  private static SpanningTree computeMinimumSpanningTree(Graph problem){
+    return new SpanningTree(problem, SpanningTree.SpanningTreeType.MINIMUM);
+  }
 
   public static RBPMSolution computeFastSolution(PathGraph pathGraph){
     LinkedList<Vertex> graph = convertPathGraphToList(pathGraph);

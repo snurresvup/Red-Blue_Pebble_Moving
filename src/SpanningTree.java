@@ -1,5 +1,7 @@
 import com.sun.org.apache.regexp.internal.RE;
 import javafx.util.Pair;
+import scala.Int;
+import scala.util.regexp.Base;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -58,8 +60,47 @@ public class SpanningTree {
   }
 
   private void constructMinimumSpanningTreePrim(Graph origin) {
-    Vertex root = origin.getFirstVertex();
+    leafs = new HashSet<>();
+    vertices = new HashSet<>();
+    edges = new HashSet<>();
 
+    Map<SpanningTreeVertex, Integer> c = new HashMap<>();
+    Set<SpanningTreeVertex> q = new HashSet<>();
+    Map<SpanningTreeVertex, Edge<SpanningTreeVertex>> e = new HashMap<>();
+
+    for(Vertex vertex : origin.getVertices()){
+      SpanningTreeVertex sV = new SpanningTreeVertex(vertex);
+      c.put(sV, Integer.MAX_VALUE);
+      q.add(sV);
+    }
+
+    while(!q.isEmpty()) {
+      SpanningTreeVertex v = null;
+      for (SpanningTreeVertex vertex : q) {
+        if (v == null || c.get(vertex) < c.get(v)) v = vertex;
+      }
+      q.remove(v);
+      vertices.add(v);
+      leafs.add(v);
+      if (e.get(v) != null) {
+        edges.add(e.get(v));
+
+        SpanningTreeVertex parent = e.get(v).getOther(v);
+        boolean parentIsLeaf = edges.stream().filter(edge -> edge.contains(parent)).count() <= 1;
+        if(!parentIsLeaf) {
+          leafs.remove(parent);
+        }
+      }
+
+      for (Map.Entry<Vertex, Integer> w : v.getModelee().getEdges().entrySet()) {
+        SpanningTreeVertex sTVW = new SpanningTreeVertex(w.getKey());
+        Edge<SpanningTreeVertex> vw = new Edge<>(v, sTVW);
+        if (q.contains(sTVW) && c.get(sTVW) > w.getValue()) {
+          c.put(sTVW, w.getValue());
+          e.put(sTVW, vw);
+        }
+      }
+    }
   }
 
   public Graph getOrigin() {
@@ -106,6 +147,41 @@ public class SpanningTree {
 
   public SpanningTreeVertex getLeaf(){
     return leafs.iterator().next();
+  }
+
+  public SpanningTreeVertex getPrioritizedLeaf() {
+    SpanningTreeVertex tEmpty = null;
+    int tEmptyWeight = 0;
+    SpanningTreeVertex sRed = null;
+    int sRedWeight = 0;
+
+    for(SpanningTreeVertex stv : leafs){
+      if(stv.getModelee() instanceof TargetVertex && stv.getModelee().getPebble(PebbleColor.RED) != null) return stv;
+      if(stv.getModelee() instanceof StartVertex && stv.getModelee().getPebble(PebbleColor.RED) == null) return stv;
+
+      Edge<SpanningTreeVertex> edge = getEdgeToLeaf(stv);
+      if(stv.getModelee() instanceof TargetVertex){
+        if(tEmpty == null || getWeightOfEdge(edge) < tEmptyWeight) {
+          tEmpty = stv;
+          tEmptyWeight = getWeightOfEdge(edge);
+        }
+      } else {
+        if(sRed == null || getWeightOfEdge(edge) < sRedWeight) {
+          sRed = stv;
+          sRedWeight = getWeightOfEdge(edge);
+        }
+      }
+    }
+
+    return tEmpty == null ? sRed : tEmpty;
+  }
+
+  private int getWeightOfEdge(Edge<SpanningTreeVertex> edge){
+    return edge.getA().getModelee().getEdges().get(edge.getB().getModelee());
+  }
+
+  public Edge<SpanningTreeVertex> getEdgeToLeaf(SpanningTreeVertex leaf){
+    return edges.stream().filter(edge -> edge.contains(leaf)).findAny().orElse(null);
   }
 
   public SpanningTreeVertex findClosestPebble(SpanningTreeVertex leaf) {

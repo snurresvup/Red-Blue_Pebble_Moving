@@ -202,7 +202,7 @@ public class PebbleSolverTest {
 
   @Test
   public void spanningTreeAlgoShouldWorkOnPath(){
-    RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(pathGraph);
+    RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(pathGraph, true, true);
     reconstructPathGraph();
     RBPMSolution solution1 = PebbleSolver.computeFastSolution(pathGraph);
 
@@ -212,7 +212,7 @@ public class PebbleSolverTest {
   @Test
   public void spanningTreeAlgoShouldWorkOnCCGraph() throws InterruptedException {
     GraphImpl g = GraphGenerator.generateCompletelyConnectedGraph(26);
-    RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(g);
+    RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(g, true, true);
     assertTrue(solution.size() > 26);
     assertTrue(GraphUtil.isSolved(g));
   }

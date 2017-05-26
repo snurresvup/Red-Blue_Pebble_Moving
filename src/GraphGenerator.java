@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class GraphGenerator {
-  public static GraphImpl generateRandomGraph(int numberOfPebbles) {
+  public static GraphImpl generateRandomGraph(int numberOfPebbles, double connectionChance) {
     GraphImpl res = new GraphImpl(new Pebble(PebbleColor.BLUE));
 
     Random r = new Random();
@@ -30,8 +30,8 @@ public class GraphGenerator {
     for (Vertex v : allVertices) {
       allVertices.stream().forEach(
           vert -> {
-            if (r.nextBoolean()) {
-              vert.addEdge(v, r.nextInt(10));
+            if (r.nextDouble() <= connectionChance) {
+              vert.addEdge(v, r.nextInt(10)+1);
             }
           });
     }
@@ -128,7 +128,7 @@ public class GraphGenerator {
   }
 
   public static void main(String[] args) {
-    GraphImpl g = generateRandomGraph(3);
+    GraphImpl g = generateRandomGraph(3, 0.5);
     g = generateCompletelyConnectedGraph(3);
     //g = generateRandomPathGraph(4);
     //g = generateSimplePathGraph(4);
