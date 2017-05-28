@@ -41,7 +41,9 @@ public abstract class Vertex {
   }
 
   public void addPebble(Pebble pebble) {
-    if(pebbles[pebble.getColor().ordinal()] != null) throw new RuntimeException("Two pebbles cannot reside on the same vertex.");
+    if(pebbles[pebble.getColor().ordinal()] != null) {
+      throw new RuntimeException("Two pebbles cannot reside on the same vertex.");
+    }
     pebbles[pebble.getColor().ordinal()] = pebble;
     pebble.setCurrentVertex(this);
   }
@@ -52,6 +54,9 @@ public abstract class Vertex {
   }
 
   public void removePebble(Pebble pebble) {
+    if(pebble == null) {
+      throw new IllegalArgumentException("cannot remove null");
+    }
     if(pebbles[pebble.getColor().ordinal()] != null && pebbles[pebble.getColor().ordinal()].equals(pebble)) {
       pebbles[pebble.getColor().ordinal()] = null;
     }

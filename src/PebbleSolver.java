@@ -8,6 +8,9 @@ public class PebbleSolver {
   public static RBPMSolution spanningTreeBasedAlgorithm(Graph problem, boolean minSpanTree, boolean prioLeaf){
     RBPMSolution solution = new RBPMSolution();
     SpanningTree spanningTree = minSpanTree ? computeMinimumSpanningTree(problem) : computeSpanningTree(problem);
+
+    checkIfSpanningTreeIsCorrect(spanningTree);
+
     SpanningTreeVertex leaf;
 
     while(!spanningTree.isEmpty()) {
@@ -78,6 +81,25 @@ public class PebbleSolver {
     solution.addAll(shortestPath(bluePebble.getCurrentVertex(), bluePebble.getOriginalVertex(), problem, false));
 
     return solution;
+  }
+
+  private static void checkIfSpanningTreeIsCorrect(SpanningTree spanningTree) {
+    for(SpanningTreeVertex spanningTreeVertex : spanningTree.getVertices()){
+      Vertex vertex = spanningTreeVertex.getModelee();
+
+      vertex.getEdges().keySet().stream().filter(vert ->
+        !spanningTree.getEdges().contains(new Edge<>(spanningTreeVertex, new SpanningTreeVertex(vert)))
+      ).forEach(vert1 -> {
+        spanningTree.getEdges().stream()
+            .filter(ed -> ed.contains(spanningTreeVertex))
+            .map(edg -> edg.getOther(spanningTreeVertex).getModelee())
+            .forEach(v -> {
+              if(vertex.getEdges().get(vert1) < spanningTreeVertex.getModelee().getEdges().get(v)){
+                throw new IllegalStateException("Spanning tree broken");
+              }
+        });
+      });
+    }
   }
 
   private static RBPMSolution shiftAllOnPath(SpanningTreeVertex from, SpanningTreeVertex to, SpanningTree spanningTree) {

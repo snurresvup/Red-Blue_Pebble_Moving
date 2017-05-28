@@ -2,7 +2,7 @@ import java.io.*;
 
 public class Experiments {
   public static final double ITERATIONS = 40.0;
-  public static final int[] PROBLEM_SIZES = new int[]{2};//{1,2};//,4,8,16};//,32,64,128,256};
+  public static final int[] PROBLEM_SIZES = new int[]{2};//{1,2,4,8,16};//,32,64,128,256};
   public static void main(String[] args) {
     //experimentCCGraphs();
     //System.out.println();

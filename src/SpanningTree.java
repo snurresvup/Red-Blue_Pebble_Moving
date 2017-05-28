@@ -18,8 +18,12 @@ public class SpanningTree {
     this.origin = origin;
 
     switch (type){
-      case MINIMUM: constructMinimumSpanningTreePrim(origin);
-      case BFS: constructBFSSpanningTree(origin.getFirstVertex());
+      case MINIMUM:
+        constructMinimumSpanningTreePrim(origin);
+        break;
+      case BFS:
+        constructBFSSpanningTree(origin.getFirstVertex());
+        break;
     }
   }
 
@@ -210,11 +214,15 @@ public class SpanningTree {
       Pair<SpanningTreeVertex, Integer> current = queue.remove();
       if(predicate.test(current.getKey())) return current.getKey();
 
-      Set<Edge<SpanningTreeVertex>> neighborhood = getNeighborhood(current.getKey());
+      Set<Edge<SpanningTreeVertex>> neighborhood = new HashSet<>();//getNeighborhood(current.getKey());
+      for(Map.Entry<Vertex, Integer> entry : current.getKey().getModelee().getEdges().entrySet()){
+        neighborhood.add(new Edge<>(current.getKey(), new SpanningTreeVertex(entry.getKey())));
+      }
       Iterator<Edge<SpanningTreeVertex>> iterator = neighborhood.iterator();
 
       while (iterator.hasNext()){
         Edge<SpanningTreeVertex> edge = iterator.next();
+        if(!vertices.contains(edge.getOther(current.getKey()))) continue;
         Pair<SpanningTreeVertex, Integer> p = queue.stream().filter(pair -> pair.getKey().equals(edge.getOther(current.getKey()))).findAny().orElse(null);
         int potentialValue = current.getKey().getModelee().getEdges().get(edge.getOther(current.getKey()).getModelee()) + current.getValue();
         if(p == null || p.getValue() > potentialValue){

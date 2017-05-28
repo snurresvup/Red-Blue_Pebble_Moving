@@ -5,7 +5,7 @@ public class GraphGenerator {
     Pebble bluePebble = new Pebble(PebbleColor.BLUE);
     GraphImpl res = new GraphImpl(bluePebble);
 
-    Random r = new Random();
+    Random r = new Random(32345);
 
     ArrayList<Pebble> pebbles = new ArrayList<>();
     for (int i = 0; i < numberOfPebbles; i++) {
