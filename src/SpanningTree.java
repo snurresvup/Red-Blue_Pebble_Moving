@@ -82,6 +82,7 @@ public class SpanningTree {
       q.remove(v);
       vertices.add(v);
       leafs.add(v);
+      System.out.println("Root is : " + v.getModelee());
       if (e.get(v) != null) {
         edges.add(e.get(v));
 
@@ -197,17 +198,31 @@ public class SpanningTree {
   }
 
   public SpanningTreeVertex findClosest(SpanningTreeVertex leaf, Predicate<SpanningTreeVertex> predicate){
-    Queue<SpanningTreeVertex> queue = new LinkedList<>();
-    queue.add(leaf);
+    PriorityQueue<Pair<SpanningTreeVertex, Integer>> queue = new PriorityQueue<>(10, new Comparator<Pair<SpanningTreeVertex, Integer>>() {
+      @Override
+      public int compare(Pair<SpanningTreeVertex, Integer> o1, Pair<SpanningTreeVertex, Integer> o2) {
+        return o1.getValue() - o2.getValue();
+      }
+    });
+    queue.add(new Pair<>(leaf,0));
 
     while(!queue.isEmpty()){
-      SpanningTreeVertex current = queue.remove();
-      if(predicate.test(current)) return current;
-      Set<Edge<SpanningTreeVertex>> neighborhood = getNeighborhood(current);
+      Pair<SpanningTreeVertex, Integer> current = queue.remove();
+      if(predicate.test(current.getKey())) return current.getKey();
+
+      Set<Edge<SpanningTreeVertex>> neighborhood = getNeighborhood(current.getKey());
       Iterator<Edge<SpanningTreeVertex>> iterator = neighborhood.iterator();
+
       while (iterator.hasNext()){
         Edge<SpanningTreeVertex> edge = iterator.next();
-        if(!queue.contains(edge.getOther(current))) queue.add(edge.getOther(current));
+        Pair<SpanningTreeVertex, Integer> p = queue.stream().filter(pair -> pair.getKey().equals(edge.getOther(current.getKey()))).findAny().orElse(null);
+        int potentialValue = current.getKey().getModelee().getEdges().get(edge.getOther(current.getKey()).getModelee()) + current.getValue();
+        if(p == null || p.getValue() > potentialValue){
+          if(p != null) {
+            queue.remove(p);
+          }
+          queue.add(new Pair<>(edge.getOther(current.getKey()), potentialValue));
+        }
       }
     }
 

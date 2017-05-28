@@ -12,26 +12,35 @@ public class PebbleSolver {
 
     while(!spanningTree.isEmpty()) {
       leaf = prioLeaf ? spanningTree.getPrioritizedLeaf() : spanningTree.getLeaf();
-
+      System.out.println("TEST"); //TODO
       if (leaf.getModelee() instanceof StartVertex) {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
+          System.out.println("TEST1,5"); //TODO
           //Start vertex with red pebble
           SpanningTreeVertex closestEmptyVertex = spanningTree.findClosestEmptyVertex(leaf);
+          System.out.println("TEST2"); //TODO
           solution.addAll(moveBluePebbleToVertex(problem.getBluePebble(), leaf.getModelee(), problem));
+          System.out.println("TEST3"); //TODO
           solution.addAll(shiftAllOnPath(leaf, closestEmptyVertex, spanningTree));
+          System.out.println("TEST4"); //TODO
         } else {
           //Empty start vertex
+          System.out.println("esv");//TODO
           if(spanningTree.noVertexNeedsWork()) break;
 
         }
       } else if (leaf.getModelee() instanceof TargetVertex) {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
           //Target vertex with red pebble
+          System.out.println("twr"); //TODO
           if(spanningTree.noVertexNeedsWork()) break;
         } else {
           //Empty target vertex
           SpanningTreeVertex closestPebble = spanningTree.findClosestPebble(leaf);
+          System.out.println("TEST5"); //TODO
+          if(closestPebble == null) return new RBPMSolution();
           solution.addAll(moveRedPebbleToVertex(closestPebble.getModelee().getPebble(PebbleColor.RED), leaf.getModelee(), problem));
+          System.out.println("TEST6"); //TODO
           Vertex neighboringVertex = null;
 
           for(Edge<SpanningTreeVertex> e : spanningTree.getEdges()){
@@ -40,6 +49,7 @@ public class PebbleSolver {
               break;
             }
           }
+          System.out.println("TEST7"); //TODO
 
           solution.addAll(moveBluePebbleToVertex(
               problem.getBluePebble()
@@ -75,6 +85,8 @@ public class PebbleSolver {
     if(bluePebble == null) throw new IllegalArgumentException("Blue pebble must be at from vertex");
 
     LinkedList<SpanningTreeVertex> path = spanningTree.getPath(from, to, null);
+
+    if(path == null) throw new UnsolvableProblemException();
 
     RBPMSolution solution = moveBluePebbleToVertex(bluePebble, path.get(path.size()-2).getModelee(), spanningTree.getOrigin());
 

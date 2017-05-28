@@ -8,6 +8,7 @@ public class GraphUtil {
   }
 
   public static int distanceTravelledByBluePebble(RBPMSolution solution, Graph problem){
+    if(solution == null) return 0;
     int res = 0;
     for(RBPMSolution.RBPMTuple t : solution){
       res += t.getFrom().getEdges().get(t.getTo());
@@ -16,6 +17,7 @@ public class GraphUtil {
   }
 
   public static int distanceTraveledByRedPebbles(RBPMSolution solution, Graph problem){
+    if(solution == null) return 0;
     int res = 0;
     for(RBPMSolution.RBPMTuple t : solution){
       if(t.isCarrying()){
@@ -26,6 +28,7 @@ public class GraphUtil {
   }
 
   public static int numberOfPickups(RBPMSolution solution){
+    if(solution == null) return 0;
     int pickups = 0;
     boolean carrying = false;
     for(RBPMSolution.RBPMTuple t : solution){

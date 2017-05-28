@@ -2,7 +2,8 @@ import java.util.*;
 
 public class GraphGenerator {
   public static GraphImpl generateRandomGraph(int numberOfPebbles, double connectionChance) {
-    GraphImpl res = new GraphImpl(new Pebble(PebbleColor.BLUE));
+    Pebble bluePebble = new Pebble(PebbleColor.BLUE);
+    GraphImpl res = new GraphImpl(bluePebble);
 
     Random r = new Random();
 
@@ -27,16 +28,32 @@ public class GraphGenerator {
     Set<Vertex> allVertices = new HashSet<>(startVertices);
     allVertices.addAll(targetVertices);
 
+    startVertices.stream().findAny().orElse(null).addPebble(bluePebble);
+
+    Set<Vertex> connectedComponent = new HashSet<>();
+
     for (Vertex v : allVertices) {
-      allVertices.stream().forEach(
-          vert -> {
-            if (r.nextDouble() <= connectionChance) {
-              vert.addEdge(v, r.nextInt(10)+1);
-            }
-          });
+      connectVertexToComponent(v, connectedComponent, connectionChance, r);
     }
 
     return res;
+  }
+
+  private static void connectVertexToComponent(Vertex v, Set<Vertex> connectedComponent, double connectionChance, Random r) {
+    boolean done = false;
+    while(!done) {
+      if(connectedComponent.size() == 0) {
+        connectedComponent.add(v);
+        done = true;
+      }
+      for (Vertex vertex : connectedComponent) {
+        if (r.nextDouble() <= connectionChance) {
+          vertex.addEdge(v, r.nextInt(10) + 1);
+          done = true;
+        }
+      }
+    }
+    connectedComponent.add(v);
   }
 
   public static GraphImpl generateCompletelyConnectedGraph(int numberOfPebbles){

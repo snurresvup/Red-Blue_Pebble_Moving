@@ -1,4 +1,4 @@
-import org.graphstream.graph.Node;
+import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.graph.implementations.SingleNode;
 import org.graphstream.ui.graphicGraph.GraphicNode;
@@ -51,7 +51,16 @@ public class GraphImpl implements Graph {
     vGraph.setAutoCreate(true);
 
     String stylesheet =
+            "edge {" +
+                "text-alignment: above;" +
+                "text-style: bold;" +
+                "text-size: 16;" +
+                "text-background-color: #666;" +
+            "}" +
             "node { " +
+                "text-style: bold;" +
+                "text-size: 16;" +
+                "text-background-color: #666;" +
                 "size: 50px, 50px;" +
                 "fill-mode: plain;" +
                 "stroke-mode : plain; " +
@@ -83,17 +92,25 @@ public class GraphImpl implements Graph {
       }
     }
 
-    Set<Edge> addedEdges = new HashSet<>();
+    Set<Edge<Vertex>> addedEdges = new HashSet<>();
     for(Vertex v : vertices){
       v.getEdges().keySet().forEach(vert -> {
-        Edge newEdge = new Edge(v, vert);
+        Edge<Vertex> newEdge = new Edge(v, vert);
         addedEdges.add(newEdge);
       });
     }
 
-    addedEdges.forEach(edge -> vGraph.addEdge(edge.toString(), edge.getA().toString(), edge.getB().toString()));
+    addedEdges.forEach(edge -> {
+      org.graphstream.graph.Edge theEdge = vGraph.addEdge(edge.toString(), edge.getA().toString(), edge.getB().toString());
+      theEdge.addAttribute("ui.label", edge.getA().getEdges().get(edge.getB()));
+    });
 
     vGraph.display();
+    try {
+      Thread.sleep(2000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   public Pebble getBluePebble() {
