@@ -20,7 +20,7 @@ public class PebbleSolver {
           //Start vertex with red pebble
           SpanningTreeVertex closestEmptyVertex = spanningTree.findClosestEmptyVertex(leaf);
           solution.addAll(moveBluePebbleToVertex(problem.getBluePebble(), leaf.getModelee(), problem));
-          solution.addAll(shiftAllOnPath(leaf, closestEmptyVertex, spanningTree));
+          solution.addAll(shiftAllOnPath(leaf, closestEmptyVertex, problem));//shiftAllOnPath(leaf, closestEmptyVertex, spanningTree));
         } else {
           //Empty start vertex
           if(spanningTree.noVertexNeedsWork()) break;
@@ -90,6 +90,98 @@ public class PebbleSolver {
         });
       });
     }
+  }
+
+  private static RBPMSolution shiftAllOnPath(SpanningTreeVertex from, SpanningTreeVertex to, Graph graph){
+    Pebble bluePebble = from.getModelee().getPebble(PebbleColor.BLUE);
+    if(bluePebble == null) throw new IllegalArgumentException("Blue pebble must be at from vertex");
+
+    LinkedList<Vertex> path = shortestPathWithPebblesAsList(from.getModelee(), to.getModelee(), graph);
+
+    RBPMSolution solution = moveBluePebbleToVertex(bluePebble, path.get(path.size()-2), graph);
+
+    ListIterator<Vertex> listIterator = path.listIterator(path.size()-1);
+
+    Vertex currentEmptyVertex = listIterator.next();
+    listIterator.previous();
+    Vertex current = listIterator.previous();
+    solution.add(new RBPMSolution.RBPMTuple(current, currentEmptyVertex, true));
+
+    Pebble pebble = current.getPebble(PebbleColor.RED);
+    current.removePebble(pebble);
+    currentEmptyVertex.addPebble(pebble);
+
+    while (listIterator.hasPrevious()){
+      solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex, current, false));
+      currentEmptyVertex = current;
+      current = listIterator.previous();
+      solution.add(new RBPMSolution.RBPMTuple(currentEmptyVertex, current, false));
+      solution.add(new RBPMSolution.RBPMTuple(current, currentEmptyVertex, true));
+
+      Pebble p = current.getPebble(PebbleColor.RED);
+      current.removePebble(p);
+      currentEmptyVertex.addPebble(p);
+    }
+    bluePebble.getCurrentVertex().removePebble(bluePebble);
+    currentEmptyVertex.addPebble(bluePebble);
+
+    return solution;
+  }
+
+  private static LinkedList<Vertex> shortestPathWithPebblesAsList(Vertex from, Vertex to, Graph graph) {
+    HashMap<Vertex, Pair<Integer,Vertex>> distances = new HashMap<>();
+    Vertex current = from;
+    distances.put(from, new Pair<>(0, null));
+    Set<Vertex> unvisited = new HashSet<>(graph.getVertices());
+    unvisited.remove(from);
+    for(Vertex v : unvisited){
+      distances.put(v, new Pair<>(Integer.MAX_VALUE, null));
+    }
+
+    while(!unvisited.isEmpty()) {
+      if(current == null) System.out.println("PANIC");
+
+      for (Vertex v : current.getEdges().keySet()) {
+        if(!v.equals(to) && v.getPebble(PebbleColor.RED) == null) continue;
+        if (distances.get(v).getKey() == Integer.MAX_VALUE) {
+          int currentVal = distances.get(current).getKey();//distances.get(current).getValue() == null ? 0 : distances.get(current).getKey();
+          distances.put(v, new Pair<>(currentVal + current.getEdges().get(v), current));
+          continue;
+        }
+
+        int distanceCandidate = current.getEdges().get(v) + distances.get(current).getKey();
+        if (distanceCandidate < distances.get(v).getKey()) {
+          distances.put(v, new Pair<>(distanceCandidate, current));
+        }
+      }
+      do {
+        unvisited.remove(current);
+        current = unvisited.stream().min(Comparator.comparingInt(s -> distances.get(s).getKey())).orElse(null);
+      }while(!unvisited.isEmpty() && Integer.MAX_VALUE == distances.get(current).getKey());
+    }
+
+    return backtrackList(from, to, distances);
+  }
+
+  private static LinkedList<Vertex> backtrackList(Vertex from, Vertex to, HashMap<Vertex, Pair<Integer, Vertex>> distances) {
+    if(from.equals(to)) {
+      LinkedList<Vertex> res = new LinkedList<>();
+      res.add(from);
+      return res;
+    }
+
+    Pebble bluePebble = from.getPebble(PebbleColor.BLUE);
+    if(bluePebble == null) throw new IllegalArgumentException("The blue pebble must be at the from vertex");
+    LinkedList<Vertex> path = new LinkedList<>();
+    Vertex current = to;
+    path.addFirst(current);
+
+    while(!current.equals(from)) {
+      current = distances.get(current).getValue();
+      path.addFirst(current);
+    }
+
+    return path;
   }
 
   private static RBPMSolution shiftAllOnPath(SpanningTreeVertex from, SpanningTreeVertex to, SpanningTree spanningTree) {

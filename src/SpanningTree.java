@@ -201,12 +201,7 @@ public class SpanningTree {
   }
 
   public SpanningTreeVertex findClosest(SpanningTreeVertex leaf, Predicate<SpanningTreeVertex> predicate){
-    PriorityQueue<Pair<SpanningTreeVertex, Integer>> queue = new PriorityQueue<>(10, new Comparator<Pair<SpanningTreeVertex, Integer>>() {
-      @Override
-      public int compare(Pair<SpanningTreeVertex, Integer> o1, Pair<SpanningTreeVertex, Integer> o2) {
-        return o1.getValue() - o2.getValue();
-      }
-    });
+    PriorityQueue<Pair<SpanningTreeVertex, Integer>> queue = new PriorityQueue<>(10, Comparator.comparingInt(Pair::getValue));
     queue.add(new Pair<>(leaf,0));
 
     while(!queue.isEmpty()){
