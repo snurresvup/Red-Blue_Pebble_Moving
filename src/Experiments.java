@@ -15,24 +15,20 @@ public class Experiments {
   }
 
   public static void compareSpanningTreeVariationsOnRandomGraphs(String fileName){
-    double pickups = 0.0;
-    double redDistance = 0.0;
-    double blueDistance = 0.0;
-
+    double pickups, redDistance, blueDistance;
 
     PrintWriter printWriter = null;
     PrintWriter simpleWriter = null;
     try {
       printWriter = new PrintWriter(fileName);
       simpleWriter = new PrintWriter(fileName + "simple");
+      printWriter.println("Iterations," + (int) ITERATIONS);
+      simpleWriter.println("Iterations," + (int) ITERATIONS);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
 
-    printWriter.println("Iterations," + (int) ITERATIONS);
-    simpleWriter.println("Iterations," + (int) ITERATIONS);
-
-    for (int k = 3; k < 4; k++) {
+    for (int k = 0; k < 4; k++) {
 
       printAlgorithmSignature(printWriter, simpleWriter, k);
 
@@ -50,17 +46,8 @@ public class Experiments {
             Graph problem = GraphGenerator.generateRandomGraph(problemSize, connectionChance);
             RBPMSolution solution;
             System.out.println(i + " , " + k + "problem size: " + problemSize);
-            //try {
-              solution = computeSolutionUsingAlgorithm(k, problem);
-            /*}catch (Exception e){
-              problem.show();
-              try {
-                Thread.sleep(2000);
-              } catch (InterruptedException e1) {
-                e1.printStackTrace();
-              }
-              throw e;
-            }*/
+
+            solution = computeSolutionUsingAlgorithm(k, problem);
 
             pickups += GraphUtil.numberOfPickups(solution);
             redDistance += GraphUtil.distanceTraveledByRedPebbles(solution, problem);

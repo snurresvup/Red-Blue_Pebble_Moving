@@ -86,7 +86,6 @@ public class SpanningTree {
       q.remove(v);
       vertices.add(v);
       leafs.add(v);
-      System.out.println("Root is : " + v.getModelee());
       if (e.get(v) != null) {
         edges.add(e.get(v));
 

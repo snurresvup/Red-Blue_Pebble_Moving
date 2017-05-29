@@ -9,41 +9,32 @@ public class PebbleSolver {
     RBPMSolution solution = new RBPMSolution();
     SpanningTree spanningTree = minSpanTree ? computeMinimumSpanningTree(problem) : computeSpanningTree(problem);
 
-    checkIfSpanningTreeIsCorrect(spanningTree);
+    //checkIfSpanningTreeIsCorrect(spanningTree); //TODO broken algorithm
 
     SpanningTreeVertex leaf;
 
     while(!spanningTree.isEmpty()) {
       leaf = prioLeaf ? spanningTree.getPrioritizedLeaf() : spanningTree.getLeaf();
-      System.out.println("TEST"); //TODO
       if (leaf.getModelee() instanceof StartVertex) {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
-          System.out.println("TEST1,5"); //TODO
           //Start vertex with red pebble
           SpanningTreeVertex closestEmptyVertex = spanningTree.findClosestEmptyVertex(leaf);
-          System.out.println("TEST2"); //TODO
           solution.addAll(moveBluePebbleToVertex(problem.getBluePebble(), leaf.getModelee(), problem));
-          System.out.println("TEST3"); //TODO
           solution.addAll(shiftAllOnPath(leaf, closestEmptyVertex, spanningTree));
-          System.out.println("TEST4"); //TODO
         } else {
           //Empty start vertex
-          System.out.println("esv");//TODO
           if(spanningTree.noVertexNeedsWork()) break;
 
         }
       } else if (leaf.getModelee() instanceof TargetVertex) {
         if (leaf.getModelee().getPebble(PebbleColor.RED) != null) {
           //Target vertex with red pebble
-          System.out.println("twr"); //TODO
           if(spanningTree.noVertexNeedsWork()) break;
         } else {
           //Empty target vertex
           SpanningTreeVertex closestPebble = spanningTree.findClosestPebble(leaf);
-          System.out.println("TEST5"); //TODO
           if(closestPebble == null) return new RBPMSolution();
-          solution.addAll(moveRedPebbleToVertex(closestPebble.getModelee().getPebble(PebbleColor.RED), leaf.getModelee(), problem));
-          System.out.println("TEST6"); //TODO
+          solution.addAll(moveRedPebbleToVertex(closestPebble.getModelee().getPebble(PebbleColor.RED), leaf.getModelee(), problem, spanningTree));
           Vertex neighboringVertex = null;
 
           for(Edge<SpanningTreeVertex> e : spanningTree.getEdges()){
@@ -52,7 +43,6 @@ public class PebbleSolver {
               break;
             }
           }
-          System.out.println("TEST7"); //TODO
 
           solution.addAll(moveBluePebbleToVertex(
               problem.getBluePebble()
@@ -78,7 +68,7 @@ public class PebbleSolver {
     }
 
     Pebble bluePebble = problem.getBluePebble();
-    solution.addAll(shortestPath(bluePebble.getCurrentVertex(), bluePebble.getOriginalVertex(), problem, false));
+    solution.addAll(shortestPath(bluePebble.getCurrentVertex(), bluePebble.getOriginalVertex(), problem, false, spanningTree));
 
     return solution;
   }
@@ -141,21 +131,21 @@ public class PebbleSolver {
   }
 
   private static RBPMSolution moveBluePebbleToVertex(Pebble bluePebble, Vertex destination, Graph graph) {
-    return shortestPath(bluePebble.getCurrentVertex(), destination, graph, false);
+    return shortestPath(bluePebble.getCurrentVertex(), destination, graph, false, null);
   }
 
-  private static RBPMSolution moveRedPebbleToVertex(Pebble pebble, Vertex destination, Graph graph) {
+  private static RBPMSolution moveRedPebbleToVertex(Pebble pebble, Vertex destination, Graph graph, SpanningTree spanningTree) {
     RBPMSolution solution = new RBPMSolution();
     Vertex pebbleVertex = pebble.getCurrentVertex();
     Vertex blueVertex = graph.getBluePebble().getCurrentVertex();
 
-    solution.addAll(shortestPath(blueVertex, pebbleVertex, graph, false));
-    solution.addAll(shortestPath(pebbleVertex, destination, graph, true));
+    solution.addAll(shortestPath(blueVertex, pebbleVertex, graph, false, spanningTree));
+    solution.addAll(shortestPath(pebbleVertex, destination, graph, true, spanningTree));
 
     return solution;
   }
 
-  private static RBPMSolution shortestPath(Vertex fromVertex, Vertex toVertex, Graph graph, boolean carrying) {
+  private static RBPMSolution shortestPath(Vertex fromVertex, Vertex toVertex, Graph graph, boolean carrying, SpanningTree spanningTree) {
     HashMap<Vertex, Pair<Integer,Vertex>> distances = new HashMap<>();
     Vertex current = fromVertex;
     distances.put(fromVertex, new Pair<>(0, null));
@@ -167,7 +157,11 @@ public class PebbleSolver {
 
     while(!unvisited.isEmpty()) {
       if(current == null) System.out.println("PANIC");
+
+      Set<Vertex> spanningTreeVertices = spanningTree == null ? null : spanningTree.getVertices().stream().map(SpanningTreeVertex::getModelee).collect(Collectors.toSet());
+
       for (Vertex v : current.getEdges().keySet()) {
+        if(carrying && !spanningTreeVertices.contains(v)) continue;
         if (distances.get(v).getKey() == Integer.MAX_VALUE) {
           int currentVal = distances.get(current).getKey();//distances.get(current).getValue() == null ? 0 : distances.get(current).getKey();
           distances.put(v, new Pair<>(currentVal + current.getEdges().get(v), current));
@@ -180,10 +174,10 @@ public class PebbleSolver {
         }
       }
 
-      unvisited.remove(current);
-
-      current = unvisited.stream().min(Comparator.comparingInt(s -> distances.get(s).getKey())).orElse(null);
-
+      do {
+        unvisited.remove(current);
+        current = unvisited.stream().min(Comparator.comparingInt(s -> distances.get(s).getKey())).orElse(null);
+      } while(!unvisited.isEmpty() && Integer.MAX_VALUE == distances.get(current).getKey());
     }
 
     return backtrack(fromVertex, toVertex, distances, carrying);
