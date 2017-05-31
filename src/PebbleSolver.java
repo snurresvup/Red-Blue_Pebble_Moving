@@ -242,7 +242,7 @@ public class PebbleSolver {
     Vertex current = fromVertex;
     distances.put(fromVertex, new Pair<>(0, null));
     Set<Vertex> unvisited = new HashSet<>(graph.getVertices());
-    unvisited = unvisited.stream().filter(v -> !v.equals(fromVertex)).collect(Collectors.toSet());
+    unvisited.remove(fromVertex);//unvisited = unvisited.stream().filter(v -> !v.equals(fromVertex)).collect(Collectors.toSet());
     for(Vertex v : unvisited){
       distances.put(v, new Pair<>(Integer.MAX_VALUE, null));
     }
@@ -253,14 +253,16 @@ public class PebbleSolver {
       Set<Vertex> spanningTreeVertices = spanningTree == null ? null : spanningTree.getVertices().stream().map(SpanningTreeVertex::getModelee).collect(Collectors.toSet());
 
       for (Vertex v : current.getEdges().keySet()) {
-        if(carrying && !spanningTreeVertices.contains(v)) continue;
+        if(carrying && v.getPebble(PebbleColor.RED) != null)//TODO this whas here before... should it be? -> !spanningTreeVertices.contains(v))
+          continue;
+        int currentVal = distances.get(current).getKey();//distances.get(current).getValue() == null ? 0 : distances.get(current).getKey();
+
         if (distances.get(v).getKey() == Integer.MAX_VALUE) {
-          int currentVal = distances.get(current).getKey();//distances.get(current).getValue() == null ? 0 : distances.get(current).getKey();
           distances.put(v, new Pair<>(currentVal + current.getEdges().get(v), current));
           continue;
         }
 
-        int distanceCandidate = current.getEdges().get(v) + distances.get(current).getKey();
+        int distanceCandidate = current.getEdges().get(v) + currentVal;
         if (distanceCandidate < distances.get(v).getKey()) {
           distances.put(v, new Pair<>(distanceCandidate, current));
         }

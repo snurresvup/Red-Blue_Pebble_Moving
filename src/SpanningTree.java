@@ -217,7 +217,9 @@ public class SpanningTree {
       while (iterator.hasNext()){
         Edge<SpanningTreeVertex> edge = iterator.next();
         if(!vertices.contains(edge.getOther(current.getKey()))) continue;
-        Pair<SpanningTreeVertex, Integer> p = queue.stream().filter(pair -> pair.getKey().equals(edge.getOther(current.getKey()))).findAny().orElse(null);
+        Pair<SpanningTreeVertex, Integer> p = queue.stream().filter(
+            pair -> pair.getKey().equals(edge.getOther(current.getKey()))
+        ).findAny().orElse(null);
         int potentialValue = current.getKey().getModelee().getEdges().get(edge.getOther(current.getKey()).getModelee()) + current.getValue();
         if(p == null || p.getValue() > potentialValue){
           if(p != null) {
