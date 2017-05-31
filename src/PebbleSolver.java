@@ -35,7 +35,7 @@ public class PebbleSolver {
           SpanningTreeVertex closestPebble = spanningTree.findClosestPebble(leaf);
           if(closestPebble == null) return new RBPMSolution();
           solution.addAll(moveRedPebbleToVertex(closestPebble.getModelee().getPebble(PebbleColor.RED), leaf.getModelee(), problem, spanningTree));
-          Vertex neighboringVertex = null;
+          /*Vertex neighboringVertex = null;
 
           for(Edge<SpanningTreeVertex> e : spanningTree.getEdges()){
             if(e.contains(leaf)) {
@@ -47,11 +47,11 @@ public class PebbleSolver {
           solution.addAll(moveBluePebbleToVertex(
               problem.getBluePebble()
               , neighboringVertex
-              , problem));
+              , problem));*/
         }
       }
 
-      Pebble bluePebble = leaf.getModelee().getPebble(PebbleColor.BLUE);
+      /*Pebble bluePebble = leaf.getModelee().getPebble(PebbleColor.BLUE);
 
       if(bluePebble != null) {
         Vertex neighbour = null;
@@ -63,7 +63,7 @@ public class PebbleSolver {
         }
 
         moveBluePebbleToVertex(bluePebble, neighbour, problem);
-      }
+      }*/
       spanningTree.removeLeaf(leaf);
     }
 

@@ -125,7 +125,7 @@ public class SpanningTree {
 
   public void removeLeaf(SpanningTreeVertex vertex){
     Set<Edge<SpanningTreeVertex>> neighborhood = getNeighborhood(vertex);
-    if(vertex.getModelee().getPebble(PebbleColor.BLUE) != null && leafs.size() > 1) throw new IllegalArgumentException("Please panic, you have removed the blue pebble");
+    //if(vertex.getModelee().getPebble(PebbleColor.BLUE) != null && leafs.size() > 1) throw new IllegalArgumentException("Please panic, you have removed the blue pebble");
 
     if(!(neighborhood.size() <= 1)){
       throw new IllegalArgumentException("Vertex is not a leaf, and cannot be removed. Leafs: " + leafs + " removed leaf: " + vertex.getModelee());

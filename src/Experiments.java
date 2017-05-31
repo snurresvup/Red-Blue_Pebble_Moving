@@ -11,9 +11,9 @@ public class Experiments {
     //compareRandomPathOnAlgorithms();
     System.out.println("Starting test...");
     //compareSpanningTreeVariationsOnCC("TheGreatTest");
-    //compareSpanningTreeVariationsOnRandomGraphs("Random graphs");
+    compareSpanningTreeVariationsOnRandomGraphs("Random graphs");
     //compareAllOnPathGraphs("Path tests");
-    timeAlgorithms("Timing test");
+    //timeAlgorithms("Timing test");
   }
 
   public static void timeAlgorithms(String filename){
@@ -42,34 +42,34 @@ public class Experiments {
           long endTime = 0;
           switch (k){
             case 0:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.spanningTreeBasedAlgorithm(problem, false, false);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
             case 1:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.spanningTreeBasedAlgorithm(problem, false, true);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
             case 2:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.spanningTreeBasedAlgorithm(problem, true, false);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
             case 3:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.spanningTreeBasedAlgorithm(problem, true, true);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
             case 4:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.computeSolution(problem);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
             case 5:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.computeFastSolution(problem);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
           }
           timeSpent += endTime - startTime;
