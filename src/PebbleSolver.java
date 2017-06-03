@@ -178,6 +178,9 @@ public class PebbleSolver {
 
     while(!current.equals(from)) {
       current = distances.get(current).getValue();
+      if(current == null){
+        System.out.println();
+      }
       path.addFirst(current);
     }
 
@@ -288,6 +291,8 @@ public class PebbleSolver {
     while(!current.equals(fromVertex)) {
       current = distances.get(current).getValue();
       path.addFirst(current);
+      if(current == null)
+        System.out.println();
     }
 
     RBPMSolution solution = new RBPMSolution();
@@ -336,7 +341,7 @@ public class PebbleSolver {
 
     double leftPebbleOverflow = getNumberOfPebblesInGraph(leftSubProblem) - getNumberOfTargetPositionsInGraph(leftSubProblem);
 
-    if(leftPebbleOverflow > 0){
+    if(leftPebbleOverflow < 0){
       solution = computeSolution(leftSubProblem, graph, assignment, bluePebble);
       solution.addAll(computeSolution(rightSubProblem, reversedOriginalGraph, assignment, bluePebble));
     } else {
@@ -345,6 +350,8 @@ public class PebbleSolver {
     }
 
     movePebbleToOrigin(bluePebble, graph, solution);
+
+    if(!GraphUtil.isSolved(pathGraph)) System.out.println("SHIET");
 
     return solution;
   }

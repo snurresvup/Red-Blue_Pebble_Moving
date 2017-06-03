@@ -1,11 +1,7 @@
-import com.sun.org.apache.regexp.internal.RE;
 import javafx.util.Pair;
-import scala.Int;
-import scala.util.regexp.Base;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 public class SpanningTree {
@@ -155,9 +151,9 @@ public class SpanningTree {
 
   public SpanningTreeVertex getPrioritizedLeaf() {
     SpanningTreeVertex tEmpty = null;
-    int tEmptyWeight = 0;
+    //int tEmptyWeight = 0;
     SpanningTreeVertex sRed = null;
-    int sRedWeight = 0;
+    //int sRedWeight = 0;
 
     for(SpanningTreeVertex stv : leafs){
       if(stv.getModelee() instanceof TargetVertex && stv.getModelee().getPebble(PebbleColor.RED) != null) return stv;
@@ -165,19 +161,23 @@ public class SpanningTree {
 
       Edge<SpanningTreeVertex> edge = getEdgeToLeaf(stv);
       if(stv.getModelee() instanceof TargetVertex){
-        if(tEmpty == null || getWeightOfEdge(edge) < tEmptyWeight) {
+        if(tEmpty == null){ //|| getWeightOfEdge(edge) < tEmptyWeight) {
           tEmpty = stv;
-          tEmptyWeight = getWeightOfEdge(edge);
+          //tEmptyWeight = getWeightOfEdge(edge);
         }
       } else {
-        if(sRed == null || getWeightOfEdge(edge) < sRedWeight) {
+        if(sRed == null){ //|| getWeightOfEdge(edge) < sRedWeight) {
           sRed = stv;
-          sRedWeight = getWeightOfEdge(edge);
+          //sRedWeight = getWeightOfEdge(edge);
         }
       }
     }
 
-    return tEmpty == null ? sRed : tEmpty;
+    SpanningTreeVertex blueLocation = new SpanningTreeVertex(origin.getBluePebble().getCurrentVertex());
+    if(tEmpty != null) return findClosestLeafInGraph(blueLocation, t -> t.getModelee() instanceof TargetVertex && t.getModelee().getPebble(PebbleColor.RED) == null);
+    return findClosestLeafInGraph(blueLocation, s -> s.getModelee() instanceof StartVertex && s.getModelee().getPebble(PebbleColor.RED) != null);
+
+    //return tEmpty == null ? sRed : tEmpty;
   }
 
   private int getWeightOfEdge(Edge<SpanningTreeVertex> edge){
@@ -200,13 +200,13 @@ public class SpanningTree {
     return findClosest(leaf, v-> v.getModelee().getPebble(PebbleColor.RED) == null);
   }
 
-  public SpanningTreeVertex findClosest(SpanningTreeVertex leaf, Predicate<SpanningTreeVertex> predicate){
+  public SpanningTreeVertex findClosestLeafInGraph(SpanningTreeVertex leaf, Predicate<SpanningTreeVertex> predicate){
     PriorityQueue<Pair<SpanningTreeVertex, Integer>> queue = new PriorityQueue<>(10, Comparator.comparingInt(Pair::getValue));
     queue.add(new Pair<>(leaf,0));
 
     while(!queue.isEmpty()){
       Pair<SpanningTreeVertex, Integer> current = queue.remove();
-      if(predicate.test(current.getKey())) return current.getKey();
+      if(leafs.contains(current.getKey()) && predicate.test(current.getKey())) return current.getKey();
 
       Set<Edge<SpanningTreeVertex>> neighborhood = new HashSet<>();//getNeighborhood(current.getKey());
       for(Map.Entry<Vertex, Integer> entry : current.getKey().getModelee().getEdges().entrySet()){
@@ -216,7 +216,40 @@ public class SpanningTree {
 
       while (iterator.hasNext()){
         Edge<SpanningTreeVertex> edge = iterator.next();
-        if(!vertices.contains(edge.getOther(current.getKey()))) continue;
+        //if(!vertices.contains(edge.getOther(current.getKey()))) continue;
+        Pair<SpanningTreeVertex, Integer> p = queue.stream().filter(
+            pair -> pair.getKey().equals(edge.getOther(current.getKey()))
+        ).findAny().orElse(null);
+        int potentialValue = current.getKey().getModelee().getEdges().get(edge.getOther(current.getKey()).getModelee()) + current.getValue();
+        if(p == null || p.getValue() > potentialValue){
+          if(p != null) {
+            queue.remove(p);
+          }
+          queue.add(new Pair<>(edge.getOther(current.getKey()), potentialValue));
+        }
+      }
+    }
+
+    return null;
+  }
+
+  public SpanningTreeVertex findClosest(SpanningTreeVertex leaf, Predicate<SpanningTreeVertex> predicate){
+    PriorityQueue<Pair<SpanningTreeVertex, Integer>> queue = new PriorityQueue<>(10, Comparator.comparingInt(Pair::getValue));
+    queue.add(new Pair<>(leaf,0));
+
+    while(!queue.isEmpty()){
+      Pair<SpanningTreeVertex, Integer> current = queue.remove();
+      if(vertices.contains(current.getKey()) && predicate.test(current.getKey())) return current.getKey();
+
+      Set<Edge<SpanningTreeVertex>> neighborhood = new HashSet<>();//getNeighborhood(current.getKey());
+      for(Map.Entry<Vertex, Integer> entry : current.getKey().getModelee().getEdges().entrySet()){
+        neighborhood.add(new Edge<>(current.getKey(), new SpanningTreeVertex(entry.getKey())));
+      }
+      Iterator<Edge<SpanningTreeVertex>> iterator = neighborhood.iterator();
+
+      while (iterator.hasNext()){
+        Edge<SpanningTreeVertex> edge = iterator.next();
+        if(!vertices.contains(edge.getOther(current.getKey())) && predicate.test(edge.getOther(current.getKey()))) continue;
         Pair<SpanningTreeVertex, Integer> p = queue.stream().filter(
             pair -> pair.getKey().equals(edge.getOther(current.getKey()))
         ).findAny().orElse(null);

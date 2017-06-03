@@ -1,19 +1,21 @@
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Experiments {
-  public static final double ITERATIONS = 40.0;
+  public static final double ITERATIONS = 40;
   public static final int[] PROBLEM_SIZES = new int[]{1,2,4,8,16,32,64,128,256};
   public static void main(String[] args) {
     //experimentCCGraphs();
     //System.out.println();
-    //compareOnSimplePath();
+    compareOnSimplePath();
     //System.out.println();
     //compareRandomPathOnAlgorithms();
     System.out.println("Starting test...");
-    //compareSpanningTreeVariationsOnCC("TheGreatTest");
-    compareSpanningTreeVariationsOnRandomGraphs("Random graphs");
-    //compareAllOnPathGraphs("Path tests");
-    //timeAlgorithms("Timing test");
+    //compareSpanningTreeVariationsOnCC("CCGraphs best algo");
+    //compareSpanningTreeVariationsOnRandomGraphs("Random graphs");
+    //compareAllOnPathGraphs("Path tests best algo");
+    //timeAlgorithms("Timing test best algo");
   }
 
   public static void timeAlgorithms(String filename){
@@ -33,11 +35,11 @@ public class Experiments {
       printAlgorithmSignature(simpleWrither, k);
 
       for(int problemSize : PROBLEM_SIZES){
-        int timeSpent = 0;
+        double timeSpent = 0;
 
         for (int i = 0; i < ITERATIONS; i++) {
           PathGraph problem = GraphGenerator.generateRandomPathGraph(problemSize);
-          RBPMSolution solution;
+          RBPMSolution solution = null;
           long startTime = 0;
           long endTime = 0;
           switch (k){
@@ -72,10 +74,10 @@ public class Experiments {
               endTime = System.currentTimeMillis();
               break;
           }
-          timeSpent += endTime - startTime;
-          if(i < 5) timeSpent = 0;
+          timeSpent += (endTime - startTime);
+          if(i < 3) timeSpent = 0;
         }
-        double avgTime = timeSpent/(ITERATIONS-5);
+        double avgTime = timeSpent/(ITERATIONS-3);
         simpleWrither.println(convertToAlgorithmSignature(k) + "," + "Random Path," + problemSize + "," + avgTime);
       }
     }
@@ -87,7 +89,7 @@ public class Experiments {
       printAlgorithmSignature(simpleWrither, k);
 
       for(int problemSize : PROBLEM_SIZES){
-        int timeSpent = 0;
+        long timeSpent = 0;
 
         for (int i = 0; i < ITERATIONS; i++) {
           Graph problem = GraphGenerator.generateRandomGraph(problemSize, 0.5);
@@ -96,29 +98,30 @@ public class Experiments {
           long endTime = 0;
           switch (k){
             case 0:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.spanningTreeBasedAlgorithm(problem, false, false);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
             case 1:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.spanningTreeBasedAlgorithm(problem, false, true);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
             case 2:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.spanningTreeBasedAlgorithm(problem, true, false);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
             case 3:
-              startTime = System.nanoTime();
+              startTime = System.currentTimeMillis();
               solution = PebbleSolver.spanningTreeBasedAlgorithm(problem, true, true);
-              endTime = System.nanoTime();
+              endTime = System.currentTimeMillis();
               break;
           }
-          timeSpent += endTime - startTime;
+          timeSpent += (endTime - startTime);
+          if(i < 3) timeSpent = 0;
         }
-        double avgTime = timeSpent/ITERATIONS;
+        double avgTime = timeSpent/(ITERATIONS-3);
         simpleWrither.println(convertToAlgorithmSignature(k) + "," + "Random Graph," + problemSize + "," + avgTime);
       }
     }
@@ -427,7 +430,7 @@ public class Experiments {
     double blueDistance = 0.0;
 
     for (int i = 0; i < iterations; i++) {
-      PathGraph problem = GraphGenerator.generateSimplePathGraph(100);
+      PathGraph problem = GraphGenerator.generateSimplePathGraph(3);
       RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(problem,true, true);
       pickups += GraphUtil.numberOfPickups(solution);
       redDistance += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
@@ -439,7 +442,7 @@ public class Experiments {
     double blueDistanceP = 0.0;
 
     for (int i = 0; i < iterations; i++) {
-      PathGraph problem = GraphGenerator.generateSimplePathGraph(100);
+      PathGraph problem = GraphGenerator.generateSimplePathGraph(3);
       RBPMSolution solution = PebbleSolver.computeFastSolution(problem);
       pickupsP += GraphUtil.numberOfPickups(solution);
       redDistanceP += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
