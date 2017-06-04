@@ -129,7 +129,7 @@ public class GraphGenerator {
     Vertex current;
 
     for (int i = 0; i < numberOfPebbles - 1; i++) {
-      if(i == 0){
+      if(i == 1){
         current = new StartVertex(new Pebble(PebbleColor.RED), true);
         current.addPebble(bluePebble);
       }else {

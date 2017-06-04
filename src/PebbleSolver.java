@@ -351,7 +351,8 @@ public class PebbleSolver {
 
     movePebbleToOrigin(bluePebble, graph, solution);
 
-    if(!GraphUtil.isSolved(pathGraph)) System.out.println("SHIET");
+    if(!GraphUtil.isSolved(pathGraph))
+      System.out.println("SHIET");
 
     return solution;
   }
@@ -380,7 +381,8 @@ public class PebbleSolver {
 
   private static RBPMSolution computeSolution(LinkedList<Vertex> subGraph, LinkedList<Vertex> originalGraph, Map<StartVertex, TargetVertex> assignment, Pebble bluePebble) {
     RBPMSolution solution = new RBPMSolution();
-    for (int i = 0; i < getNumberOfPebblesInGraph(subGraph); i++) {
+    double nPebbles = getNumberOfPebblesInGraph(subGraph);
+    for (int i = 0; i < nPebbles; i++) {
       Pebble r = findLeftMostFreePebble(subGraph, originalGraph, assignment);
 
       if(r == null) continue;
@@ -537,10 +539,14 @@ public class PebbleSolver {
 
     if(currentCandidatePosition.equals(assignment.get(candidatePebble.getOriginalVertex()))) return false;
 
-    int direction = (int)Math.signum(graph.indexOf(candidateTarget) - graph.indexOf(currentCandidatePosition));
-
-    for (int i = graph.indexOf(currentCandidatePosition) + direction; i - graph.indexOf(candidateTarget) != 0; i += direction) {
-      if (graph.get(i).getPebble(PebbleColor.RED) != null) return false;
+    if(graph.indexOf(currentCandidatePosition) > graph.indexOf(candidateTarget)){
+      for (int i = graph.indexOf(currentCandidatePosition) - 1; i > graph.indexOf(candidateTarget); i--) {
+        if(graph.get(i).getPebble(PebbleColor.RED) != null) return false;
+      }
+    } else {
+      for (int i = graph.indexOf(currentCandidatePosition) + 1; i <= graph.indexOf(candidateTarget); i++) {
+        if (graph.get(i).getPebble(PebbleColor.RED) != null) return false;
+      }
     }
 
     return true;

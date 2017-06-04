@@ -10,7 +10,7 @@ public class Experiments {
     //System.out.println();
     compareOnSimplePath();
     //System.out.println();
-    //compareRandomPathOnAlgorithms();
+    compareRandomPathOnAlgorithms();
     System.out.println("Starting test...");
     //compareSpanningTreeVariationsOnCC("CCGraphs best algo");
     //compareSpanningTreeVariationsOnRandomGraphs("Random graphs");
@@ -430,7 +430,7 @@ public class Experiments {
     double blueDistance = 0.0;
 
     for (int i = 0; i < iterations; i++) {
-      PathGraph problem = GraphGenerator.generateSimplePathGraph(3);
+      PathGraph problem = GraphGenerator.generateSimplePathGraph(100);
       RBPMSolution solution = PebbleSolver.spanningTreeBasedAlgorithm(problem,true, true);
       pickups += GraphUtil.numberOfPickups(solution);
       redDistance += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
@@ -442,7 +442,7 @@ public class Experiments {
     double blueDistanceP = 0.0;
 
     for (int i = 0; i < iterations; i++) {
-      PathGraph problem = GraphGenerator.generateSimplePathGraph(3);
+      PathGraph problem = GraphGenerator.generateSimplePathGraph(100);
       RBPMSolution solution = PebbleSolver.computeFastSolution(problem);
       pickupsP += GraphUtil.numberOfPickups(solution);
       redDistanceP += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
