@@ -537,9 +537,10 @@ public class PebbleSolver {
 
     if(currentCandidatePosition.equals(assignment.get(candidatePebble.getOriginalVertex()))) return false;
 
-    //For debugging try to check if target index < candidate index. (Should never happen)
-    for (int i = graph.indexOf(currentCandidatePosition)+1; i <= graph.indexOf(candidateTarget); i++) {
-      if(graph.get(i).getPebble(PebbleColor.RED) != null) return false;
+    int direction = (int)Math.signum(graph.indexOf(candidateTarget) - graph.indexOf(currentCandidatePosition));
+
+    for (int i = graph.indexOf(currentCandidatePosition) + direction; i - graph.indexOf(candidateTarget) != 0; i += direction) {
+      if (graph.get(i).getPebble(PebbleColor.RED) != null) return false;
     }
 
     return true;
