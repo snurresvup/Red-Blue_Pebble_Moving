@@ -22,4 +22,8 @@ public interface Graph {
   Pebble getBluePebble();
 
   Set<Vertex> getVertices();
+
+  void computeAPSPForGraph();
+
+  org.graphstream.graph.Graph getGSGraph();
 }

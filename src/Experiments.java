@@ -8,14 +8,17 @@ public class Experiments {
   public static void main(String[] args) {
     //experimentCCGraphs();
     //System.out.println();
-    compareOnSimplePath();
+    //compareOnSimplePath();
     //System.out.println();
-    compareRandomPathOnAlgorithms();
-    System.out.println("Starting test...");
-    //compareSpanningTreeVariationsOnCC("CCGraphs best algo");
-    //compareSpanningTreeVariationsOnRandomGraphs("Random graphs");
-    //compareAllOnPathGraphs("Path tests best algo");
-    //timeAlgorithms("Timing test best algo");
+    //compareRandomPathOnAlgorithms();
+    System.out.println("Starting test...CC");
+    //compareSpanningTreeVariationsOnCC("CCGraphs Final algo");
+    System.out.println("Random graphs");
+    compareSpanningTreeVariationsOnRandomGraphs("Random graphs Final with less connections");
+    //System.out.println("Path graphs");
+    //compareAllOnPathGraphs("Path tests Final");
+    //System.out.println("Timing");
+    //timeAlgorithms("Timing test Final");
   }
 
   public static void timeAlgorithms(String filename){
@@ -31,14 +34,13 @@ public class Experiments {
     //Time on random path graphs
     simpleWrither.println("Time on random path graphs");
 
-    for (int k = 0; k < 6; k++) {
-      printAlgorithmSignature(simpleWrither, k);
 
-      for(int problemSize : PROBLEM_SIZES){
-        double timeSpent = 0;
-
-        for (int i = 0; i < ITERATIONS; i++) {
-          PathGraph problem = GraphGenerator.generateRandomPathGraph(problemSize);
+    for(int problemSize : PROBLEM_SIZES){
+      System.out.println(problemSize);
+      double[] timeSpent = new double[6];
+      for (int i = 0; i < ITERATIONS; i++) {
+        PathGraph problem = GraphGenerator.generateRandomPathGraph(problemSize);
+        for (int k = 0; k < 6; k++) {
           RBPMSolution solution = null;
           long startTime = 0;
           long endTime = 0;
@@ -74,10 +76,13 @@ public class Experiments {
               endTime = System.currentTimeMillis();
               break;
           }
-          timeSpent += (endTime - startTime);
-          if(i < 3) timeSpent = 0;
+          timeSpent[k] += (endTime - startTime);
+          if(i < 3) timeSpent[k] = 0;
+          GraphUtil.resetGraphToOriginalState(problem);
         }
-        double avgTime = timeSpent/(ITERATIONS-3);
+      }
+      for (int k = 0; k < 6; k++) {
+        double avgTime = timeSpent[k]/(ITERATIONS-3);
         simpleWrither.println(convertToAlgorithmSignature(k) + "," + "Random Path," + problemSize + "," + avgTime);
       }
     }
@@ -85,14 +90,14 @@ public class Experiments {
     //Time on random graphs
     simpleWrither.println("Time on random graphs");
 
-    for (int k = 0; k < 4; k++) {
-      printAlgorithmSignature(simpleWrither, k);
+    for(int problemSize : PROBLEM_SIZES){
+      System.out.println(problemSize);
+      double timeSpent[] = new double[4];
 
-      for(int problemSize : PROBLEM_SIZES){
-        long timeSpent = 0;
+      for (int i = 0; i < ITERATIONS; i++) {
+        Graph problem = GraphGenerator.generateRandomGraph(problemSize, 0.5);
+        for (int k = 0; k < 4; k++) {
 
-        for (int i = 0; i < ITERATIONS; i++) {
-          Graph problem = GraphGenerator.generateRandomGraph(problemSize, 0.5);
           RBPMSolution solution;
           long startTime = 0;
           long endTime = 0;
@@ -118,10 +123,13 @@ public class Experiments {
               endTime = System.currentTimeMillis();
               break;
           }
-          timeSpent += (endTime - startTime);
-          if(i < 3) timeSpent = 0;
+          timeSpent[k] += (endTime - startTime);
+          if(i < 3) timeSpent[k] = 0;
+          GraphUtil.resetGraphToOriginalState(problem);
         }
-        double avgTime = timeSpent/(ITERATIONS-3);
+      }
+      for (int k = 0; k < 4; k++) {
+        double avgTime = timeSpent[k]/(ITERATIONS-3);
         simpleWrither.println(convertToAlgorithmSignature(k) + "," + "Random Graph," + problemSize + "," + avgTime);
       }
     }
@@ -151,14 +159,11 @@ public class Experiments {
   }
 
   public static void compareAllOnPathGraphs(String fileName){
-    int pickups, redDistance, blueDistance;
+    int[] pickups, redDistance, blueDistance;
 
-    PrintWriter printWriter = null;
     PrintWriter simpleWriter = null;
     try {
-      printWriter = new PrintWriter(fileName);
       simpleWriter = new PrintWriter(fileName + "simple");
-      printWriter.println("Iterations," + (int) ITERATIONS);
       simpleWriter.println("Iterations," + (int) ITERATIONS);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -166,120 +171,91 @@ public class Experiments {
 
     for(int j = 0; j < 2; j++) {
       if(j == 0) {
-        printWriter.println("Graph type Simple Path");
         simpleWriter.println("Graph type Simple Path");
       }else{
-        printWriter.println("Graph type Random Path");
         simpleWriter.println("Graph type Random Path");
       }
-      for (int k = 0; k < 6; k++) {
 
-        printAlgorithmSignature(printWriter, simpleWriter, k);
 
-        for (int problemSize : PROBLEM_SIZES) {
-          pickups = 0;
-          redDistance = 0;
-          blueDistance = 0;
+      for (int problemSize : PROBLEM_SIZES) {
+        if (j == 0 ) System.out.println("Simple " + problemSize);
+        else System.out.println("Random " + problemSize);
+        pickups = new int[6];
+        redDistance = new int[6];
+        blueDistance = new int[6];
 
-          for (int i = 0; i < ITERATIONS; i++) {
-            PathGraph problem = j == 0 ? GraphGenerator.generateSimplePathGraph(problemSize) : GraphGenerator.generateRandomPathGraph(problemSize);
-            RBPMSolution solution;
-            System.out.println(i + " , " + k + "problem size: " + problemSize);
-
+        for (int i = 0; i < ITERATIONS; i++) {
+          PathGraph problem = j == 0 ? GraphGenerator.generateSimplePathGraph(problemSize) : GraphGenerator.generateRandomPathGraph(problemSize);
+          RBPMSolution solution;
+          for (int k = 0; k < 6; k++) {
+            System.out.println(i + " , " + k + " problem size: " + problemSize);
             if(k<4) {
               solution = computeSolutionUsingAlgorithm(k, problem);
             } else if(k == 4){
               solution = PebbleSolver.computeSolution(problem);
             } else {
-              solution = PebbleSolver.computeSolution(problem);
+              solution = PebbleSolver.computeFastSolution(problem);
             }
 
-            pickups += GraphUtil.numberOfPickups(solution);
-            redDistance += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
-            blueDistance += GraphUtil.distanceTravelledByBluePebble(solution, problem);
+            pickups[k] += GraphUtil.numberOfPickups(solution);
+            redDistance[k] += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
+            blueDistance[k] += GraphUtil.distanceTravelledByBluePebble(solution, problem);
+            GraphUtil.resetGraphToOriginalState(problem);
           }
-
-          printWriter.println();
-
-          printWriter.println("Problem Size," + problemSize);
-          printWriter.println("Pickups," + pickups);
-          printWriter.println("Red Distance," + redDistance);
-          printWriter.println("Blue Distance," + blueDistance);
-
-          simpleWriter.println(problemSize + "," + pickups + "," + redDistance + "," + blueDistance);
-
+          if(j==0) {
+            GraphUtil.outputArrayRepresentationToFile(problem, i, (int) ITERATIONS - 1, "all_test_on_simple_paths_" + problemSize);
+          } else {
+            GraphUtil.outputArrayRepresentationToFile(problem, i, (int) ITERATIONS - 1, "all_test_on_random_paths_" + problemSize);
+          }
         }
-
-        simpleWriter.println();
-        printWriter.println();
+        for (int k = 0; k < 6; k++) {
+          simpleWriter.println(convertToAlgorithmSignature(k) + "," + problemSize + "," + (pickups[k]/ITERATIONS) + "," + (redDistance[k]/ITERATIONS) + "," + (blueDistance[k]/ITERATIONS));
+        }
       }
     }
 
     simpleWriter.flush();
     simpleWriter.close();
-    printWriter.flush();
-    printWriter.close();
   }
 
   public static void compareSpanningTreeVariationsOnRandomGraphs(String fileName){
-    double pickups, redDistance, blueDistance;
+    double[] pickups, redDistance, blueDistance;
 
-    PrintWriter printWriter = null;
     PrintWriter simpleWriter = null;
     try {
-      printWriter = new PrintWriter(fileName);
       simpleWriter = new PrintWriter(fileName + "simple");
-      printWriter.println("Iterations," + (int) ITERATIONS);
       simpleWriter.println("Iterations," + (int) ITERATIONS);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
+    double[] connectionChances = new double[]{0.1};
+    RBPMSolution solution;
 
-    for (int k = 0; k < 4; k++) {
-
-      printAlgorithmSignature(printWriter, simpleWriter, k);
-
-      double[] connectionChances = new double[]{0.3, 0.5, 0.7};
-
-      for(double connectionChance : connectionChances) {
-        printWriter.println("Graph type " + connectionChance);
-        simpleWriter.println("Graph type " + connectionChance);
-        for (int problemSize : PROBLEM_SIZES) {
-          pickups = 0.0;
-          redDistance = 0.0;
-          blueDistance = 0.0;
-
-          for (int i = 0; i < ITERATIONS; i++) {
-            Graph problem = GraphGenerator.generateRandomGraph(problemSize, connectionChance);
-            RBPMSolution solution;
-            System.out.println(i + " , " + k + "problem size: " + problemSize);
-
+    for(double connectionChance : connectionChances) {
+      for (int problemSize : PROBLEM_SIZES) {
+        System.out.println(connectionChance + " " + problemSize);
+        pickups = new double[4];
+        redDistance = new double[4];
+        blueDistance = new double[4];
+        for (int i = 0; i < ITERATIONS; i++) {
+          Graph problem = GraphGenerator.generateRandomGraph(problemSize, connectionChance);
+          for (int k = 0; k < 4; k++) {
+            System.out.println(i + " , " + k + " problem size: " + problemSize);
             solution = computeSolutionUsingAlgorithm(k, problem);
-
-            pickups += GraphUtil.numberOfPickups(solution);
-            redDistance += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
-            blueDistance += GraphUtil.distanceTravelledByBluePebble(solution, problem);
+            pickups[k] += GraphUtil.numberOfPickups(solution);
+            redDistance[k] += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
+            blueDistance[k] += GraphUtil.distanceTravelledByBluePebble(solution, problem);
+            GraphUtil.resetGraphToOriginalState(problem);
           }
-
-          printWriter.println();
-
-          printWriter.println("Problem Size," + problemSize);
-          printWriter.println("Pickups," + pickups);
-          printWriter.println("Red Distance," + redDistance);
-          printWriter.println("Blue Distance," + blueDistance);
-
-          simpleWriter.println(problemSize + "," + pickups + "," + redDistance + "," + blueDistance);
-
+          GraphUtil.outputArrayRepresentationToFile(problem, i, (int)ITERATIONS-1, "all_test_on_random_" + connectionChance + "_graphs_" + problemSize);
+        }
+        for (int k = 0; k < 4; k++) {
+          simpleWriter.println(connectionChance + "," + problemSize + "," + pickups[k]/ITERATIONS + "," + redDistance[k]/ITERATIONS + "," + blueDistance[k]/ITERATIONS);
         }
       }
-      simpleWriter.println();
-      printWriter.println();
     }
-
     simpleWriter.flush();
     simpleWriter.close();
-    printWriter.flush();
-    printWriter.close();
   }
 
   private static RBPMSolution computeSolutionUsingAlgorithm(int k, Graph problem) {
@@ -305,58 +281,41 @@ public class Experiments {
   }
 
   public static void compareSpanningTreeVariationsOnCC(String fileName){
-    double pickups = 0.0;
-    double redDistance = 0.0;
-    double blueDistance = 0.0;
+    double[] pickups;
+    double[] redDistance;
+    double[] blueDistance;
 
-
-    PrintWriter printWriter = null;
     PrintWriter simpleWriter = null;
     try {
-      printWriter = new PrintWriter(fileName);
       simpleWriter = new PrintWriter(fileName + "simple");
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
 
-    printWriter.println("Iterations," + (int) ITERATIONS);
-    simpleWriter.println("Iterations," + (int) ITERATIONS);
+    for (int problemSize : PROBLEM_SIZES) {
+      System.out.println(problemSize);
+      pickups = new double[4];
+      redDistance = new double[4];
+      blueDistance = new double[4];
 
-    for (int k = 0; k < 4; k++) {
-
-      printAlgorithmSignature(printWriter, simpleWriter, k);
-
-      for (int problemSize : PROBLEM_SIZES) {
-        pickups = 0.0;
-        redDistance = 0.0;
-        blueDistance = 0.0;
-
-        for (int i = 0; i < ITERATIONS; i++) {
-          Graph problem = GraphGenerator.generateCompletelyConnectedGraph(problemSize);
+      for (int i = 0; i < ITERATIONS; i++) {
+        Graph problem = GraphGenerator.generateCompletelyConnectedGraph(problemSize);
+        for (int k = 0; k < 4; k++) {
           RBPMSolution solution = computeSolutionUsingAlgorithm(k,problem);
-          pickups += GraphUtil.numberOfPickups(solution);
-          redDistance += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
-          blueDistance += GraphUtil.distanceTravelledByBluePebble(solution, problem);
+          pickups[k] += GraphUtil.numberOfPickups(solution);
+          redDistance[k] += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
+          blueDistance[k] += GraphUtil.distanceTravelledByBluePebble(solution, problem);
+          GraphUtil.resetGraphToOriginalState(problem);
         }
-
-        printWriter.println();
-
-        printWriter.println("Problem Size," + problemSize);
-        printWriter.println("Pickups," + pickups);
-        printWriter.println("Red Distance," + redDistance);
-        printWriter.println("Blue Distance," + blueDistance);
-
-        simpleWriter.println(problemSize + "," + pickups + "," + redDistance + "," + blueDistance);
-
+        GraphUtil.outputArrayRepresentationToFile(problem, i, (int)ITERATIONS-1, "all_test_on_cc_graphs_" + problemSize);
       }
-      simpleWriter.println();
-      printWriter.println();
+      for (int k = 0; k < 4; k++) {
+        simpleWriter.println(problemSize + "," + pickups[k]/ITERATIONS + "," + redDistance[k]/ITERATIONS + "," + blueDistance[k]/ITERATIONS);
+      }
     }
 
     simpleWriter.flush();
     simpleWriter.close();
-    printWriter.flush();
-    printWriter.close();
   }
 
   private static void printAlgorithmSignature(PrintWriter simpleWriter, int k) {

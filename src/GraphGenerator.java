@@ -122,19 +122,14 @@ public class GraphGenerator {
     Pebble bluePebble = new Pebble(PebbleColor.BLUE);
     PathGraph res = new PathGraph(bluePebble);
 
-    Vertex prev = new StartVertex(new Pebble(PebbleColor.RED));//, true);
-    //prev.addPebble(bluePebble);
+    Vertex prev = new StartVertex(new Pebble(PebbleColor.RED), true);
+    prev.addPebble(bluePebble);
     res.addVertex(prev);
 
     Vertex current;
 
     for (int i = 0; i < numberOfPebbles - 1; i++) {
-      if(i == 1){
-        current = new StartVertex(new Pebble(PebbleColor.RED), true);
-        current.addPebble(bluePebble);
-      }else {
-        current = new StartVertex(new Pebble(PebbleColor.RED));
-      }
+      current = new StartVertex(new Pebble(PebbleColor.RED));
       current.addEdge(prev, 1);
       res.addVertex(current);
       prev = current;
@@ -150,10 +145,23 @@ public class GraphGenerator {
   }
 
   public static void main(String[] args) {
-    GraphImpl g = generateRandomGraph(3, 0.5);
-    g = generateCompletelyConnectedGraph(3);
+    GraphImpl g = generateRandomGraph(4, 0.3);
+
+    //g.show();
+    GraphUtil.outputArrayRepresentationToFile(g,0, 2,"JSON_data");
+    g=generateRandomGraph(4,0.3);
+    GraphUtil.outputArrayRepresentationToFile(g,1, 2, "JSON_data");
+    g=generateRandomGraph(4,0.3);
+    GraphUtil.outputArrayRepresentationToFile(g,2, 2, "JSON_data");
+
+    //g.computeAPSPForGraph();
+
+    //APSP.APSPInfo info = g.getGSGraph().getNode(g.getFirstVertex().toString()).getAttribute(APSP.APSPInfo.ATTRIBUTE_NAME);
+    //Vertex v = g.getVertices().stream().filter(vert -> !(vert instanceof StartVertex)).findAny().orElse(null);
+    //System.out.println(info.getShortestPathTo(v.toString()));
+    //System.out.println(info.getLengthTo(v.toString()));
     //g = generateRandomPathGraph(4);
     //g = generateSimplePathGraph(4);
-    g.show();
+    //g.show();
   }
 }

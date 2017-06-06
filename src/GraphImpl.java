@@ -1,3 +1,4 @@
+import org.graphstream.algorithm.APSP;
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.graph.implementations.SingleNode;
@@ -8,6 +9,7 @@ import java.util.*;
 public class GraphImpl implements Graph {
   private Set<Vertex> vertices;
   private Pebble bluePebble;
+  private org.graphstream.graph.Graph vGraph;
 
   public GraphImpl(Pebble bluePebble){
     this.bluePebble = bluePebble;
@@ -100,10 +102,10 @@ public class GraphImpl implements Graph {
       });
     }
 
-    addedEdges.forEach(edge -> {
+    for(Edge<Vertex> edge: addedEdges){
       org.graphstream.graph.Edge theEdge = vGraph.addEdge(edge.toString(), edge.getA().toString(), edge.getB().toString());
       theEdge.addAttribute("ui.label", edge.getA().getEdges().get(edge.getB()));
-    });
+    }
 
     vGraph.display();
     try {
@@ -111,6 +113,81 @@ public class GraphImpl implements Graph {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+  }
+
+  public org.graphstream.graph.Graph getGSGraph(){
+    if(vGraph != null) return vGraph;
+    System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+    vGraph = new SingleGraph("The graph");
+    vGraph.setStrict(false);
+    vGraph.setAutoCreate(true);
+
+    String stylesheet =
+        "edge {" +
+            "text-alignment: above;" +
+            "text-style: bold;" +
+            "text-size: 16;" +
+            "text-background-color: #666;" +
+            "}" +
+            "node { " +
+            "text-style: bold;" +
+            "text-size: 16;" +
+            "text-background-color: #666;" +
+            "size: 50px, 50px;" +
+            "fill-mode: plain;" +
+            "stroke-mode : plain; " +
+            "stroke-width : 20px;" +
+            "fill-color: #FFF;" +
+            "}" +
+            "node.blue { fill-color: blue; }" +
+            "node.red { fill-color: red; }" +
+            "node.start { stroke-color : #0F0; }" +
+            "node.target { stroke-color : #F00; }";
+
+    vGraph.addAttribute("ui.stylesheet", stylesheet);
+
+    for(Vertex v : vertices){
+      Node n = vGraph.addNode(v.toString());
+      n.addAttribute("ui.label", v.toString());
+
+      if(v instanceof TargetVertex){
+        if(v.getPebble(PebbleColor.RED) != null) n.addAttribute("ui.class", "target, red");
+        else n.addAttribute("ui.class", "target");
+      }
+
+      if(v instanceof StartVertex){
+        if(v.getPebble(PebbleColor.RED) != null) {
+          n.addAttribute("ui.class", "start, red");
+          if(v.getPebble(PebbleColor.BLUE) != null) n.addAttribute("ui.class", "start, blue");
+        }
+        else n.addAttribute("ui.class", "start");
+      }
+    }
+
+    Set<Edge<Vertex>> addedEdges = new HashSet<>();
+    for(Vertex v : vertices){
+      v.getEdges().keySet().forEach(vert -> {
+        Edge<Vertex> newEdge = new Edge(v, vert);
+        addedEdges.add(newEdge);
+      });
+    }
+
+    for(Edge<Vertex> edge: addedEdges){
+      vGraph.addEdge(edge.toString(), edge.getA().toString(), edge.getB().toString());
+      org.graphstream.graph.Edge theEdge =  vGraph.getEdge(edge.toString());
+
+      if(theEdge == null)
+        System.out.println("watt");
+      theEdge.addAttribute("ui.label", edge.getA().getEdges().get(edge.getB()));
+      theEdge.addAttribute("weight", edge.getA().getEdges().get(edge.getB()));
+    }
+
+    return vGraph;
+  }
+
+  public void computeAPSPForGraph(){
+    APSP allPairsShortestPaths = new APSP(getGSGraph(), "weight",false);
+    allPairsShortestPaths.compute();
   }
 
   public Pebble getBluePebble() {

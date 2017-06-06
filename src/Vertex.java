@@ -1,3 +1,4 @@
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.util.*;
 
 public abstract class Vertex {
@@ -7,7 +8,7 @@ public abstract class Vertex {
   private boolean blueStart;
 
   public Vertex(){
-    name = UUID.randomUUID().toString();
+    name = Counter.getInstance().getAValue() + "";//System.nanoTime()+"";//UUID.randomUUID().toString();
     edges = new HashMap<>();
     pebbles = new Pebble[Settings.COLORS];
     blueStart = false;
@@ -50,7 +51,8 @@ public abstract class Vertex {
 
   @Override
   public String toString(){
-    return name.substring(name.length() - 3, name.length());
+    return name.toString();
+    //return name.substring(name.length() - 3, name.length());
   }
 
   public void removePebble(Pebble pebble) {

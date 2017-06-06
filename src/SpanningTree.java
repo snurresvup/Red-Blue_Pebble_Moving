@@ -159,7 +159,7 @@ public class SpanningTree {
       if(stv.getModelee() instanceof TargetVertex && stv.getModelee().getPebble(PebbleColor.RED) != null) return stv;
       if(stv.getModelee() instanceof StartVertex && stv.getModelee().getPebble(PebbleColor.RED) == null) return stv;
 
-      Edge<SpanningTreeVertex> edge = getEdgeToLeaf(stv);
+      //Edge<SpanningTreeVertex> edge = getEdgeToLeaf(stv);
       if(stv.getModelee() instanceof TargetVertex){
         if(tEmpty == null){ //|| getWeightOfEdge(edge) < tEmptyWeight) {
           tEmpty = stv;
@@ -176,8 +176,6 @@ public class SpanningTree {
     SpanningTreeVertex blueLocation = new SpanningTreeVertex(origin.getBluePebble().getCurrentVertex());
     if(tEmpty != null) return findClosestLeafInGraph(blueLocation, t -> t.getModelee() instanceof TargetVertex && t.getModelee().getPebble(PebbleColor.RED) == null);
     return findClosestLeafInGraph(blueLocation, s -> s.getModelee() instanceof StartVertex && s.getModelee().getPebble(PebbleColor.RED) != null);
-
-    //return tEmpty == null ? sRed : tEmpty;
   }
 
   private int getWeightOfEdge(Edge<SpanningTreeVertex> edge){

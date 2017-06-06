@@ -245,21 +245,15 @@ public class PebbleSolver {
     Vertex current = fromVertex;
     distances.put(fromVertex, new Pair<>(0, null));
     Set<Vertex> unvisited = new HashSet<>(graph.getVertices());
-    unvisited.remove(fromVertex);//unvisited = unvisited.stream().filter(v -> !v.equals(fromVertex)).collect(Collectors.toSet());
+    unvisited.remove(fromVertex);
     for(Vertex v : unvisited){
       distances.put(v, new Pair<>(Integer.MAX_VALUE, null));
     }
 
     while(!unvisited.isEmpty()) {
-      if(current == null) System.out.println("PANIC");
-
-      Set<Vertex> spanningTreeVertices = spanningTree == null ? null : spanningTree.getVertices().stream().map(SpanningTreeVertex::getModelee).collect(Collectors.toSet());
-
       for (Vertex v : current.getEdges().keySet()) {
-        if(carrying && v.getPebble(PebbleColor.RED) != null)//TODO this whas here before... should it be? -> !spanningTreeVertices.contains(v))
-          continue;
-        int currentVal = distances.get(current).getKey();//distances.get(current).getValue() == null ? 0 : distances.get(current).getKey();
-
+        if(carrying && v.getPebble(PebbleColor.RED) != null) continue;
+        int currentVal = distances.get(current).getKey();
         if (distances.get(v).getKey() == Integer.MAX_VALUE) {
           distances.put(v, new Pair<>(currentVal + current.getEdges().get(v), current));
           continue;
@@ -281,7 +275,7 @@ public class PebbleSolver {
   }
 
   private static RBPMSolution backtrack(Vertex fromVertex, Vertex toVertex, HashMap<Vertex, Pair<Integer, Vertex>> distances, boolean carrying) {
-    if(fromVertex.equals(toVertex)) return new RBPMSolution();//throw new IllegalArgumentException("cannot have self loop (from = to)");
+    if(fromVertex.equals(toVertex)) return new RBPMSolution();
     Pebble bluePebble = fromVertex.getPebble(PebbleColor.BLUE);
     if(bluePebble == null) throw new IllegalArgumentException("The blue pebble must be at the from vertex");
     LinkedList<Vertex> path = new LinkedList<>();
@@ -350,9 +344,6 @@ public class PebbleSolver {
     }
 
     movePebbleToOrigin(bluePebble, graph, solution);
-
-    if(!GraphUtil.isSolved(pathGraph))
-      System.out.println("SHIET");
 
     return solution;
   }
@@ -476,8 +467,7 @@ public class PebbleSolver {
 
   private static void transitionToRedPebble(RBPMSolution solution
                                           , LinkedList<Vertex> graph
-                                          , Map<StartVertex
-                                          , TargetVertex> assignment
+                                          , Map<StartVertex, TargetVertex> assignment
                                           , Pebble bluePebble
                                           , Pebble r
                                           , int direction) {
