@@ -14,7 +14,9 @@ public class Experiments {
     System.out.println("Starting test...CC");
     //compareSpanningTreeVariationsOnCC("CCGraphs Final algo");
     System.out.println("Random graphs");
-    compareSpanningTreeVariationsOnRandomGraphs("Random graphs Final with less connections");
+    //compareSpanningTreeVariationsOnRandomGraphs("Random graphs Final with less connections");
+    System.out.println("Random Tree Based Graphs");
+    compareSpanningTreeVariationsOnRandomTreeBasedGraphs("TreeBasedGraphs");
     //System.out.println("Path graphs");
     //compareAllOnPathGraphs("Path tests Final");
     //System.out.println("Timing");
@@ -251,6 +253,50 @@ public class Experiments {
         }
         for (int k = 0; k < 4; k++) {
           simpleWriter.println(connectionChance + "," + problemSize + "," + pickups[k]/ITERATIONS + "," + redDistance[k]/ITERATIONS + "," + blueDistance[k]/ITERATIONS);
+        }
+      }
+    }
+    simpleWriter.flush();
+    simpleWriter.close();
+  }
+
+  public static void compareSpanningTreeVariationsOnRandomTreeBasedGraphs(String fileName){
+    double[] pickups, redDistance, blueDistance;
+
+    PrintWriter simpleWriter = null;
+    try {
+      simpleWriter = new PrintWriter(fileName + "simple");
+      simpleWriter.println("Iterations," + (int) ITERATIONS);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    int[] maxNumberOfEdgesPrVertex = new int[]{3,4,5,10};
+
+    RBPMSolution solution;
+
+    for(int numberOfEdgesPrVertex : maxNumberOfEdgesPrVertex) {
+      for (int problemSize : PROBLEM_SIZES) {
+        int[] edgeNumbers = new int[]{(int) (((problemSize*2-1)+((problemSize*2*(numberOfEdgesPrVertex))/2.0))/2.0),((problemSize*2*(numberOfEdgesPrVertex))/2)-1};
+        for(int numberOfEdges: edgeNumbers) {
+          System.out.println("Maxedges: " + numberOfEdgesPrVertex + " number of edges: " + numberOfEdges + " problem size: " + problemSize);
+          pickups = new double[4];
+          redDistance = new double[4];
+          blueDistance = new double[4];
+          for (int i = 0; i < ITERATIONS; i++) {
+            Graph problem = GraphGenerator.generateRandomTreebasedGraph(problemSize, numberOfEdges, numberOfEdgesPrVertex);
+            for (int k = 0; k < 4; k++) {
+              System.out.println(i + " , " + k + " problem size: " + problemSize);
+              solution = computeSolutionUsingAlgorithm(k, problem);
+              pickups[k] += GraphUtil.numberOfPickups(solution);
+              redDistance[k] += GraphUtil.distanceTraveledByRedPebbles(solution, problem);
+              blueDistance[k] += GraphUtil.distanceTravelledByBluePebble(solution, problem);
+              GraphUtil.resetGraphToOriginalState(problem);
+            }
+            GraphUtil.outputArrayRepresentationToFile(problem, i, (int) ITERATIONS - 1, "all_test_on_random_tree_based_" + numberOfEdges + "_maxedges_" + numberOfEdgesPrVertex + "_graphs_" + problemSize);
+          }
+          for (int k = 0; k < 4; k++) {
+            simpleWriter.println(numberOfEdgesPrVertex + "," + numberOfEdges + "," + problemSize + "," + pickups[k] / ITERATIONS + "," + redDistance[k] / ITERATIONS + "," + blueDistance[k] / ITERATIONS);
+          }
         }
       }
     }

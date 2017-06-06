@@ -118,6 +118,66 @@ public class GraphGenerator {
     return res;
   }
 
+  public static Graph generateRandomTreebasedGraph(int numberOfPebbles, int numberOfEdges, int connectionLimit){
+    ArrayList<Vertex> vertexArrayList = new ArrayList<>(2*numberOfPebbles);
+    Random r = new Random();
+    for (int i = 0; i < numberOfPebbles; i++) {
+      StartVertex st = new StartVertex(new Pebble(PebbleColor.RED));
+      TargetVertex tg = new TargetVertex();
+
+      vertexArrayList.add(st); vertexArrayList.add(tg);
+
+    }
+
+    int blueStartIndex = r.nextInt(numberOfPebbles)*2;
+    vertexArrayList.remove(blueStartIndex);
+
+    Pebble bluePebble = new Pebble(PebbleColor.BLUE);
+    StartVertex blueStartVertex = new StartVertex(new Pebble(PebbleColor.RED), true);
+    blueStartVertex.addPebble(bluePebble);
+    vertexArrayList.add(blueStartIndex, blueStartVertex);
+
+    Collections.shuffle(vertexArrayList);
+
+    GraphImpl result = new GraphImpl(bluePebble);
+
+    ArrayList<Vertex> connectedComponent = new ArrayList<>(2*numberOfPebbles);
+
+    for (Vertex v : vertexArrayList) {
+      result.addVertex(v);
+      if(connectedComponent.isEmpty()) {
+        connectedComponent.add(v);
+        continue;
+      }
+
+      Vertex connectionPoint = connectedComponent.get(r.nextInt(connectedComponent.size()));
+      result.addConnection(connectionPoint, v, r.nextInt(10)+1);
+      connectedComponent.add(v);
+      if(connectionPoint.getEdges().size() >= connectionLimit){
+        connectedComponent.remove(connectionPoint);
+      }
+    }
+
+    for (int i = 0; i < numberOfEdges - 2*numberOfPebbles + 1; i++) {
+      if(connectedComponent.size() <= 1) throw new IllegalArgumentException("The parameters does not allow for this many edges");
+      Vertex connectionPointA = connectedComponent.get(r.nextInt(connectedComponent.size()));
+      Vertex connectionPointB = connectedComponent.get(r.nextInt(connectedComponent.size()));
+      while(connectionPointA.equals(connectionPointB)){
+        connectionPointB = connectedComponent.get(r.nextInt(connectedComponent.size()));
+      }
+
+      result.addConnection(connectionPointA, connectionPointB, r.nextInt(10) + 1);
+      if(connectionPointA.getEdges().size() >= connectionLimit){
+        connectedComponent.remove(connectionPointA);
+      }
+      if(connectionPointB.getEdges().size() >= connectionLimit){
+        connectedComponent.remove(connectionPointB);
+      }
+    }
+
+    return result;
+  }
+
   public static PathGraph generateSimplePathGraph(int numberOfPebbles){
     Pebble bluePebble = new Pebble(PebbleColor.BLUE);
     PathGraph res = new PathGraph(bluePebble);
